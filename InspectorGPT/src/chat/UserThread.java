@@ -28,22 +28,27 @@ final class UserThread extends Thread {
     public void run() {
         try {
             
-            List<String> usernames = this.server.getUserNames();
-
+            
             // send connected users list
-            this.sendMessage("Connected users: " + usernames);
+            List<String> usernames = this.server.getUserNames();
+            this.sendMessage(usernames.toString());
             
             // get username
-            this.username = fromUser.readLine();
-            
+            this.username = fromUser.readLine();  // ovo dobijas od clientwriteThreada
+        
+            //=============================================
+
             // Broadcast that new user has entered the chat
             this.server.broadcast(this, "New user connected: " + this.username);
             
              // choose user to play a game with
-            String usernameOpponent = getUsernameOpponent(usernames);
+            String usernameOpponent = getUsernameOpponent();
 
-            // send messages to opponent
-            getClientMessageToOpponent(usernames, usernameOpponent);
+            // send request to opponent
+           // boolean accepted = this.server.sendRequestTo(usernameOpponent, this.username);
+            //if (accepted)
+                // send messages to opponent
+            //    getClientMessageToOpponent(usernames, usernameOpponent);
             
             // broadcast to global chat
             // getClientMessage();
@@ -82,23 +87,57 @@ final class UserThread extends Thread {
     }
 
 
-    private String getUsernameOpponent(List<String> usernames) throws IOException {
-        this.sendMessage("If there isn't any user to play with, wait for someone to connect.");
-        while (usernames.size() == 0) {
+    private String getUsernameOpponent() throws IOException {
+
+        List<String> usernames = getUserNamesOfOpponents();
+
+        // wait for users to connect
+        usernames = ifNoUsersConnectedWait(usernames);
+
+        // ask user to choose opponent
+        this.sendMessage("Chose from 0 to " + (usernames.size()-1) + ". \nConnected users: " + usernames);
+
+        // get index of opponent
+        int userIndex = getValidInteger();
+        while (userIndex < 0 || userIndex >= usernames.size()) {
+            this.sendMessage("Invalid index. Chose from 0 to " + (usernames.size()-1) + ". Connected users: " + usernames);
+            userIndex = getValidInteger();
+        }
+        return usernames.get(userIndex);
+    }
+
+
+    private int getValidInteger() throws IOException {
+        
+        int userIndex;
+        while (true) {
+            this.sendMessage("Chose opponent. Enter an integer: ");
             try {
-                wait(5000);
+                userIndex = Integer.parseInt(fromUser.readLine());
+                break; // Exit loop on successful parsing
+            } catch (NumberFormatException e) {
+                this.sendMessage("Invalid input. Please enter a valid integer.");
+            }
+        }
+        return userIndex;
+    }
+
+
+    private List<String> ifNoUsersConnectedWait(List<String> usernames) {
+        if (usernames.size() == 0) {
+            this.sendMessage("No other users connected. Wait for someone to connect.");
+        }
+        while (usernames.size() == 0) { // ovo se moze rijesiti i sa wait() i notify()
+            try {
+                sleep(5000);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            usernames = getUserNamesOfOpponents();
+            
         }
-        this.sendMessage("Chose from 0 to " + usernames.size() + ". Connected users: " + usernames);
-        int userIndex = Integer.parseInt(fromUser.readLine());
-        while (userIndex < 0 || userIndex >= usernames.size()) {
-            this.sendMessage("Invalid index. Chose from 0 to " + usernames.size() + ". Connected users: " + usernames);
-            userIndex = Integer.parseInt(fromUser.readLine());
-        }
-        return usernames.get(userIndex);
+        return usernames;
     }
 
 /*
@@ -111,6 +150,13 @@ final class UserThread extends Thread {
 
     }
  */
+
+    private List<String> getUserNamesOfOpponents() {
+        List<String> usernames = this.server.getUserNames();
+        usernames.remove(this.username);
+        return usernames;
+    }
+
 
     private void getClientMessage() throws IOException {
         String clientMessage;
@@ -132,6 +178,8 @@ final class UserThread extends Thread {
     void sendMessage(String message) {
         if (this.toUser != null)
             this.toUser.println(message);
+        else
+            System.out.println("Error sending message to user " + this.username);
     }
 
     String getNickname() {

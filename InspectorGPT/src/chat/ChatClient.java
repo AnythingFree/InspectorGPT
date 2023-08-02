@@ -31,7 +31,7 @@ final class ChatClient {
         this.port = port;
     }
 
-    // postavlja se ime, konektuje se na server, pokrecu se tredovi, cekaju se tredovi
+    // konektuje se na server, postavlja se ime, pokrecu se tredovi, cekaju se tredovi
     void execute() {
         try {
             
@@ -42,10 +42,10 @@ final class ChatClient {
                 // get connected users
                 BufferedReader read = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 String usernames = read.readLine();
-
+                
 
                 // print connected users
-                System.out.println("\r" + usernames);
+                System.out.println("\rConnected users: " +  usernames);
 
                 // make connected users list
                 List<String> userList = getUserList(usernames);
@@ -56,10 +56,6 @@ final class ChatClient {
                     System.out.println("Username is taken. Please choose a different username: ");
                     setName();
                 }
-
-                // send name to server
-                PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
-                writer.println(this.name);
                 
                 // ovo sve iznad radimo ovde u klijentu jer this.name treba da se prosledi u tredove
                 // dispatch threads

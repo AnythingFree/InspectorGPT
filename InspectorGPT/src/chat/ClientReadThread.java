@@ -34,7 +34,7 @@ final class ClientReadThread extends Thread {
                 System.out.println("\r" + response);
 
                 // Print prompt
-                System.out.printf("[%s]: ", this.username);
+                System.out.printf("\r[%s]: ", this.username);
             } catch (IOException ex) {
                 System.out.println("Error reading from server: " + ex.getMessage());
                 ex.printStackTrace();

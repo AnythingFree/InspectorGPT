@@ -76,6 +76,7 @@ final class ChatServer {
         synchronized (this.users) {
             return this.users.stream()
                     .map(UserThread::getNickname)
+                    .filter(nullName -> nullName != null)
                     .collect(Collectors.toList());
         }
     }

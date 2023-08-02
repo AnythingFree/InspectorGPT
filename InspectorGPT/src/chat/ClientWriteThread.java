@@ -13,6 +13,7 @@ final class ClientWriteThread extends Thread {
         this.username = username;
         try {
             this.toServer = new PrintWriter(socket.getOutputStream(), true);
+            this.toServer.flush();
         } catch (IOException ex) {
             System.out.println("Error getting output stream from user : " + ex.getMessage());
             ex.printStackTrace();
@@ -30,7 +31,7 @@ final class ClientWriteThread extends Thread {
             String text;
             
             do {
-                System.out.printf("[%s]: ", this.username);
+                System.out.printf("\rw[%s]: ", this.username);
                 
                 text = sc.nextLine();
                 
