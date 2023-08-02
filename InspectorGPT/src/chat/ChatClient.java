@@ -1,13 +1,13 @@
 package chat;
 
-import java.net.*;
-import java.io.*;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Scanner;
 
 final class ChatClient {
 
-    // NOTE: In IntelliJ IDEA you need to allow parallel run for this class
-    // To do so, open Run Configurations dialog and check `Allow parallel run`
-    // for ChatClient configuration
+
     public static void main(String[] args) {
         ChatClient client = new ChatClient("localhost", ChatServer.SERVER_TEST_PORT);
         System.err.println("Connecting to local port: " + ChatServer.SERVER_TEST_PORT);
@@ -25,23 +25,25 @@ final class ChatClient {
         this.port = port;
     }
 
-
+    // postavlja se ime, konektuje se na server, pokrecu se tredovi, cekaju se tredovi
     void execute() {
         try {
             this.setName();
 
             try (Socket socket = new Socket(this.hostname, this.port)) {
-                System.out.println("Connected to the chat server @ " + this.hostname);
+            	
+                //System.out.println("Connected to the chat server @ " + this.hostname);
 
                 // Dispatch threads
-                var rt = new ClientReadThread(this.name, socket);
+                Thread rt = new ClientReadThread(this.name, socket);
+                Thread wt = new ClientWriteThread(this.name, socket);
                 rt.start();
-                var wt = new ClientWriteThread(this.name, socket);
                 wt.start();
 
                 // Wait for threads so we can close the socket (try-with-resources)
                 rt.join();
                 wt.join();
+                
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -54,8 +56,9 @@ final class ChatClient {
 
     private void setName() throws IOException {
         System.out.print("Enter your name: ");
-        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-        this.name = stdin.readLine();
-        // We cannot close stdin, since we will use it later
+        Scanner sc = new Scanner(System.in);
+        this.name = sc.nextLine();
+        // sc.close();
+        // We cannot close sc, since we will use it later
     }
 }

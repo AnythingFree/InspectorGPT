@@ -2,6 +2,7 @@ package chat;
 
 import java.io.*;
 import java.net.*;
+import java.util.List;
 
 final class UserThread extends Thread {
     private final ChatServer server;
@@ -28,7 +29,8 @@ final class UserThread extends Thread {
         try {
             // Upon connecting, read username and send connected users list
             this.username = fromUser.readLine();
-            this.sendMessage("Connected users: " + this.server.getUserNames());
+            List<String> names = this.server.getUserNames();
+            this.sendMessage("Chose from 0 to " + names.size() + ". Connected users: " + names);
 
             // Broadcast that new user has entered the chat
             this.server.broadcast(this, "New user connected: " + this.username);
@@ -43,6 +45,7 @@ final class UserThread extends Thread {
 
                 // Broadcast the message
                 this.server.broadcast(this, "[" + this.username + "]: " + clientMessage);
+                
             } while (!clientMessage.equals("bye"));
 
             // Broadcast that user has disconnected

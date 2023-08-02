@@ -14,7 +14,7 @@ final class ClientWriteThread extends Thread {
         try {
             this.toServer = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException ex) {
-            System.out.println("Error getting output stream: " + ex.getMessage());
+            System.out.println("Error getting output stream from user : " + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -28,9 +28,12 @@ final class ClientWriteThread extends Thread {
         // Then send input to server line by line, until `bye`
         try (Scanner sc = new Scanner(System.in)) {
             String text;
+            
             do {
-                System.out.printf("\r[%s]: ", this.username);
+                System.out.printf("[%s]: ", this.username);
+                
                 text = sc.nextLine();
+                
                 this.toServer.println(text);
             } while (!text.equals("bye"));
         }

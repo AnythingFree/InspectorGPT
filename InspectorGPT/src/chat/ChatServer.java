@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 final class ChatServer {
-    static final int SERVER_TEST_PORT = 12345;
+    static final int SERVER_TEST_PORT = 5000;
 
 
     public static void main(String[] args) {
@@ -34,7 +34,7 @@ final class ChatServer {
                 Socket client = server.accept();
                 System.err.println("Client connected.");
 
-                // We dispatch a new thread for each user in the chat
+                // We dispatch a new thread for each user in the chat 
                 UserThread user = new UserThread(client, this);
                 this.users.add(user);
                 user.start();
@@ -53,8 +53,7 @@ final class ChatServer {
         synchronized (this.users) {
             this.users.stream()
                     .filter(u -> u != sender)
-                    .forEach(u -> u.sendMessage(message))
-            ;
+                    .forEach(u -> u.sendMessage(message));
         }
     }
 
@@ -68,8 +67,8 @@ final class ChatServer {
         synchronized (this.users) {
             return this.users.stream()
                     .map(UserThread::getNickname)
-                    .collect(Collectors.toList())
-                    ;
+                    .collect(Collectors.toList());
         }
     }
+    
 }

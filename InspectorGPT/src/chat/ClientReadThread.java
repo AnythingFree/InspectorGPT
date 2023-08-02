@@ -13,7 +13,7 @@ final class ClientReadThread extends Thread {
         try {
             this.fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException ex) {
-            System.out.println("Error getting input stream: " + ex.getMessage());
+            System.out.println("Error getting input stream from server : " + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -26,14 +26,15 @@ final class ClientReadThread extends Thread {
             try {
                 // Wait for message and print it
                 String response = this.fromServer.readLine();
+                
                 if (response == null) {
-                    System.err.println("\rConnection lost.");
+                    System.err.println("\rConnection lost!");
                     return;
                 }
                 System.out.println("\r" + response);
 
                 // Print prompt
-                System.out.printf("\r[%s]: ", this.username);
+                System.out.printf("[%s]: ", this.username);
             } catch (IOException ex) {
                 System.out.println("Error reading from server: " + ex.getMessage());
                 ex.printStackTrace();
