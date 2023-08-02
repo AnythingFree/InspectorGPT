@@ -57,6 +57,15 @@ final class ChatServer {
         }
     }
 
+    public void broadcastTo(String usernameOpponent, UserThread userThread, String string) {
+        synchronized (this.users) {
+            this.users.stream()
+                    .filter(u -> u.getNickname().equals(usernameOpponent))
+                    .findFirst()
+                    .ifPresent(u -> u.sendMessage(string));
+        }
+    }
+
     void remove(UserThread user) {
         String username = user.getNickname();
         this.users.remove(user);
@@ -70,5 +79,8 @@ final class ChatServer {
                     .collect(Collectors.toList());
         }
     }
+
+
+    
     
 }

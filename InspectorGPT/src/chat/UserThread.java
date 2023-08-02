@@ -27,30 +27,27 @@ final class UserThread extends Thread {
     @Override
     public void run() {
         try {
-            // Upon connecting, read username and send connected users list
-            this.username = fromUser.readLine();
-            List<String> names = this.server.getUserNames();
-            this.sendMessage("Chose from 0 to " + names.size() + ". Connected users: " + names);
+            
+            List<String> usernames = this.server.getUserNames();
 
+            // send connected users list
+            this.sendMessage("Connected users: " + usernames);
+            
+            // get username
+            this.username = fromUser.readLine();
+            
             // Broadcast that new user has entered the chat
             this.server.broadcast(this, "New user connected: " + this.username);
+            
+             // choose user to play a game with
+            String usernameOpponent = getUsernameOpponent(usernames);
 
-            // Process the user (until he leaves the chat)
-            String clientMessage;
-            do {
-                // Read message from user
-                clientMessage = fromUser.readLine();
-                if (clientMessage == null)
-                    break;
-
-                // Broadcast the message
-                this.server.broadcast(this, "[" + this.username + "]: " + clientMessage);
-                
-            } while (!clientMessage.equals("bye"));
-
-            // Broadcast that user has disconnected
-            this.server.broadcast(this, this.username + " has left the chat.");
-
+            // send messages to opponent
+            getClientMessageToOpponent(usernames, usernameOpponent);
+            
+            // broadcast to global chat
+            // getClientMessage();
+            
         } catch (IOException ex) {
             System.out.println("Error in UserThread: " + ex.getMessage());
             ex.printStackTrace();
@@ -65,6 +62,71 @@ final class UserThread extends Thread {
                 e.printStackTrace();
             }
         }
+    }
+
+
+    private void getClientMessageToOpponent(List<String> usernames, String usernameOpponent) throws IOException {
+
+       
+        String clientMessage;
+        do {
+            // Read message from user
+            clientMessage = fromUser.readLine();
+            if (clientMessage == null)
+                break;
+
+            // send message to chosen user
+            this.server.broadcastTo(usernameOpponent, this, "[" + this.username + "]: " + clientMessage);
+            
+        } while (!clientMessage.equals("bye"));
+    }
+
+
+    private String getUsernameOpponent(List<String> usernames) throws IOException {
+        this.sendMessage("If there isn't any user to play with, wait for someone to connect.");
+        while (usernames.size() == 0) {
+            try {
+                wait(5000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        this.sendMessage("Chose from 0 to " + usernames.size() + ". Connected users: " + usernames);
+        int userIndex = Integer.parseInt(fromUser.readLine());
+        while (userIndex < 0 || userIndex >= usernames.size()) {
+            this.sendMessage("Invalid index. Chose from 0 to " + usernames.size() + ". Connected users: " + usernames);
+            userIndex = Integer.parseInt(fromUser.readLine());
+        }
+        return usernames.get(userIndex);
+    }
+
+/*
+    private void getUsername(List<String> usernames) throws IOException {
+        // Ask for username until it is unique
+        this.sendMessage("Enter your username: ");
+        while (usernames.contains(this.username = fromUser.readLine())) {
+            this.sendMessage("Username is taken. Please choose a different username: ");
+        }
+
+    }
+ */
+
+    private void getClientMessage() throws IOException {
+        String clientMessage;
+        do {
+            // Read message from user
+            clientMessage = fromUser.readLine();
+            if (clientMessage == null)
+                break;
+
+            // Broadcast the message
+            this.server.broadcast(this, "[" + this.username + "]: " + clientMessage);
+            
+        } while (!clientMessage.equals("bye"));
+
+        // Broadcast that user has disconnected
+        this.server.broadcast(this, this.username + " has left the chat.");
     }
 
     void sendMessage(String message) {
