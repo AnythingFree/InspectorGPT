@@ -18,10 +18,15 @@ final class ChatServer {
     private final int port;
     private final Set<UserThread> users;
 
+    private List<Channel> allChannels = new ArrayList<>();
+    
+
 
     ChatServer(int port) {
         this.port = port;
         this.users = Collections.synchronizedSet(new HashSet<>());
+        this.allChannels.add(new Channel("general"));
+        this.allChannels.add(new Channel("0"));
     }
 
 
@@ -57,19 +62,42 @@ final class ChatServer {
         }
     }
 
-    public void broadcastTo(String usernameOpponent, UserThread userThread, String string) {
+
+    public boolean sendRequestTo(String usernameOpponent, String username) {
+        Optional<UserThread> foundUser;
         synchronized (this.users) {
-            this.users.stream()
+            foundUser = 
+                    this.users.stream()
                     .filter(u -> u.getNickname().equals(usernameOpponent))
-                    .findFirst()
-                    .ifPresent(u -> u.sendMessage(string));
+                    .findFirst();             
         }
+
+        String message = "Do you want to play a game with " + username + "? (yes/no)";
+
+        boolean response = false; 
+        if (foundUser.isPresent()) {
+
+            //foundUser.get().interrupt();
+            response = foundUser.get().receveRequest(message, username);
+        }
+
+        return response;
+
     }
 
     void remove(UserThread user) {
         String username = user.getNickname();
         this.users.remove(user);
         System.err.println("Client disconnected: " + username);
+    }
+
+    public UserThread getUserByName(String usernameOpponent) {
+        synchronized (this.users) {
+            return this.users.stream()
+                    .filter(u -> u.getNickname().equals(usernameOpponent))
+                    .findFirst()
+                    .orElse(null);
+        }
     }
 
     List<String> getUserNames() {
@@ -80,6 +108,25 @@ final class ChatServer {
                     .collect(Collectors.toList());
         }
     }
+
+
+
+
+    public Channel getChannelByName(String channelName) {
+        return this.allChannels.stream()
+                .filter(c -> c.getName().equals(channelName))
+                .findFirst()
+                .orElse(null);
+    }
+
+
+    public void addChannel(Channel channel) {
+        this.allChannels.add(channel);
+    }
+
+
+    
+    
 
 
     

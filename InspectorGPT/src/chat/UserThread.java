@@ -2,6 +2,7 @@ package chat;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.List;
 
 final class UserThread extends Thread {
@@ -10,6 +11,13 @@ final class UserThread extends Thread {
     private BufferedReader fromUser;
     private PrintWriter toUser;
     private String username;
+
+    private List<Channel> subscribedChannels = new ArrayList<>();
+
+    private volatile boolean requestPending = false;
+    private Channel currentChannel;
+    private boolean exit;
+
 
 
     UserThread(Socket socket, ChatServer server) {
@@ -37,22 +45,12 @@ final class UserThread extends Thread {
             this.username = fromUser.readLine();  // ovo dobijas od clientwriteThreada
         
             //=============================================
+            // menue
+            while(exit == false){
+                menue();
+            }
 
-            // Broadcast that new user has entered the chat
-            this.server.broadcast(this, "New user connected: " + this.username);
-            
-             // choose user to play a game with
-            String usernameOpponent = getUsernameOpponent();
 
-            // send request to opponent
-           // boolean accepted = this.server.sendRequestTo(usernameOpponent, this.username);
-            //if (accepted)
-                // send messages to opponent
-            //    getClientMessageToOpponent(usernames, usernameOpponent);
-            
-            // broadcast to global chat
-            // getClientMessage();
-            
         } catch (IOException ex) {
             System.out.println("Error in UserThread: " + ex.getMessage());
             ex.printStackTrace();
@@ -70,24 +68,69 @@ final class UserThread extends Thread {
     }
 
 
-    private void getClientMessageToOpponent(List<String> usernames, String usernameOpponent) throws IOException {
 
-       
-        String clientMessage;
-        do {
-            // Read message from user
-            clientMessage = fromUser.readLine();
-            if (clientMessage == null)
-                break;
 
-            // send message to chosen user
-            this.server.broadcastTo(usernameOpponent, this, "[" + this.username + "]: " + clientMessage);
-            
-        } while (!clientMessage.equals("bye"));
+
+    private void menue() throws IOException { // ovo ce morati biti tred jer se rad mora prekinuti kad dodje zahtjev za igru
+        while(!requestPending){ // dok nema zahtjeva za igru
+
+                this.sendMessage("1. Choose user to play a game\n2. Chat with everyone\n3. Exit\n4. pomocni");
+                int choiceInt = getValidInteger();
+
+                switch (choiceInt) {
+                    case 1:
+                        playGame();
+                        break;
+                    case 2:
+                        chatWithEveryone();
+                        break;
+                    case 3:
+                        this.exit = true;
+                        break;
+                    case 4:
+                        break;
+                    default:
+                        this.sendMessage("Invalid choice.");
+                        break;
+                }
+
+            }
+
+        System.out.println("izasao iz menija");
+        sendClientMessage();
+        this.requestPending = false;
+        
+
     }
 
 
-    private String getUsernameOpponent() throws IOException {
+    private void chatWithEveryone() {
+        // subscribe to general channel
+        Channel channel = this.server.getChannelByName("general");
+        channel.subscribe(this);
+        this.currentChannel = channel;
+        this.requestPending = true;
+    }
+
+
+    private void playGame() {
+        // choose user to play a game with
+        String usernameOpponent = getUsernameOpponent();
+
+        
+        // send request to opponent
+        boolean accepted = this.server.sendRequestTo(usernameOpponent, this.username);
+        if (accepted){
+            this.requestPending = true;
+            this.sendMessage("Request accepted.");
+        } else
+            this.sendMessage("Request rejected.");
+    }
+
+
+
+
+    private String getUsernameOpponent() {
 
         List<String> usernames = getUserNamesOfOpponents();
 
@@ -107,13 +150,13 @@ final class UserThread extends Thread {
     }
 
 
-    private int getValidInteger() throws IOException {
+    private int getValidInteger() {
         
         int userIndex;
         while (true) {
-            this.sendMessage("Chose opponent. Enter an integer: ");
+            this.sendMessage(" Enter an integer: ");
             try {
-                userIndex = Integer.parseInt(fromUser.readLine());
+                userIndex = Integer.parseInt(readFromUser());
                 break; // Exit loop on successful parsing
             } catch (NumberFormatException e) {
                 this.sendMessage("Invalid input. Please enter a valid integer.");
@@ -158,7 +201,7 @@ final class UserThread extends Thread {
     }
 
 
-    private void getClientMessage() throws IOException {
+    private void sendClientMessage() throws IOException {
         String clientMessage;
         do {
             // Read message from user
@@ -167,12 +210,13 @@ final class UserThread extends Thread {
                 break;
 
             // Broadcast the message
-            this.server.broadcast(this, "[" + this.username + "]: " + clientMessage);
+            this.currentChannel.publish(this, "[" + this.username + "]: " + clientMessage);
             
         } while (!clientMessage.equals("bye"));
 
-        // Broadcast that user has disconnected
-        this.server.broadcast(this, this.username + " has left the chat.");
+        // remove the user and subscribe to menu
+        this.currentChannel.unsubscribe(this);
+        //this.server.subscribeToMenu(this);
     }
 
     void sendMessage(String message) {
@@ -181,8 +225,87 @@ final class UserThread extends Thread {
         else
             System.out.println("Error sending message to user " + this.username);
     }
+    public void receiveMessage(String message) {
+        this.sendMessage(message);
+    }
+
+    public String readFromUser() {
+        String response = null;
+        try {
+            response = fromUser.readLine();
+        } catch (IOException e) {
+            System.out.println("Error reading from user: " + e.getMessage());
+        }
+        return response;
+    }
 
     String getNickname() {
+        return this.username;
+    }
+
+    public boolean receveRequest(String message, String usernameOpponent) {
+
+
+        this.requestPending = true;
+
+        // show request to user
+        this.sendMessage(message);
+
+        // get response
+        String response = readFromUser();
+        System.out.println(response);
+        if (response.equals("yes"))
+        {
+            // get opponent
+            UserThread opponent = this.server.getUserByName(usernameOpponent);
+
+            // create channel and subscribe users to it
+            Channel channel = new Channel(this.username+" "+usernameOpponent, this, opponent);
+            this.server.addChannel(channel);
+
+            // set current channel
+            opponent.currentChannel = channel;
+            this.currentChannel = channel;
+
+            return true;
+        }
+            
+        else
+            return false;
+        
+    }
+
+
+    private void initiateRequest() {
+        
+            
+        
+    }
+
+
+    
+
+    public void subscribeToChannel(String channelName) {
+        Channel channel = this.server.getChannelByName(channelName);
+        if (channel != null)
+            this.currentChannel = channel;
+        else
+            this.sendMessage("Channel " + channelName + " does not exist.");
+
+    }
+
+    public void unsubscribeFromChannel(Channel channel) {
+        subscribedChannels.remove(channel);
+        channel.unsubscribe(this);
+    }
+
+    public void sendMessageToChannel(String channelName, String message) {
+        // Find the channel and publish the message
+        // Handle interruptions if necessary
+    }
+
+
+    public String getUsername() {
         return this.username;
     }
 }
