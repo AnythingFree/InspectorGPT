@@ -92,14 +92,14 @@ final class ChatClient {
 
     private void getWt(Socket socket) throws InterruptedException {
         // Dispatch threads
-        Thread rt = new ClientReadThread(this.name, socket);
-        Thread wt = new ClientWriteThread(this.name, socket);
-        rt.start();
-        wt.start();
+       // Thread rt = new ClientReadThread(this.name, socket);
+       // Thread wt = new ClientWriteThread(this.name, socket);
+       // rt.start();
+       // wt.start();
 
         // Wait for threads so we can close the socket (try-with-resources)
-        rt.join();
-        wt.join();
+       // rt.join();
+       // wt.join();
     }
 
     private void setName() throws IOException {
