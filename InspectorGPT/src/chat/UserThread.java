@@ -6,33 +6,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 final class UserThread extends Thread {
-    private final ChatServer server;
-    private final Socket sock;
-    private BufferedReader fromUser;
-    private PrintWriter toUser;
-    private String username;
+	private final ChatServer server;
+	private final Socket sock;
+	private BufferedReader fromUser;
+	private PrintWriter toUser;
+	private String username;
 
-    private List<Channel> subscribedChannels = new ArrayList<>();
+	private List<Channel> subscribedChannels = new ArrayList<>();
 
-    private volatile boolean requestPending = false;
-    private Channel currentChannel;
-    private boolean exit;
+	private volatile boolean requestPending = false;
+	private Channel currentChannel;
+	private boolean exit = false;
 
+	UserThread(Socket socket, ChatServer server) {
+		this.sock = socket;
+		this.server = server;
+		try {
+			this.fromUser = new BufferedReader(new InputStreamReader(this.sock.getInputStream()));
+			this.toUser = new PrintWriter(this.sock.getOutputStream(), true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-
-    UserThread(Socket socket, ChatServer server) {
-        this.sock = socket;
-        this.server = server;
-        try {
-            this.fromUser = new BufferedReader(new InputStreamReader(this.sock.getInputStream()));
-            this.toUser = new PrintWriter(this.sock.getOutputStream(), true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    @Override
+	@Override
     public void run() {
         try {
             
@@ -43,20 +40,22 @@ final class UserThread extends Thread {
             
             // get username
             this.username = fromUser.readLine();  // ovo dobijas od clientwriteThreada
-        
+            System.err.println("Client username: " + username);
+            
             //=============================================
             // menue
-            while(exit == false){
+            while(this.exit == false){
                 menue();
             }
-
+            System.out.println("ovde");
+            
 
         } catch (IOException ex) {
             System.out.println("Error in UserThread: " + ex.getMessage());
             ex.printStackTrace();
         } finally {
             // Remove user from set
-            this.server.remove(this);
+        	this.server.remove(this);
 
             // Close socket
             try {
@@ -67,245 +66,228 @@ final class UserThread extends Thread {
         }
     }
 
+	private void menue() throws IOException { // ovo ce morati biti tred jer se rad mora prekinuti kad dodje zahtjev za
+												// igru
+		while (!requestPending && !this.exit) { // dok nema zahtjeva za igru
 
+			this.sendMessage("1. Choose user to play a game\n2. Chat with everyone\n3. Exit\n4. pomocni");
+			int choiceInt = getValidInteger();
 
+			switch (choiceInt) {
+			case 1:
+				playGame();
+				break;
+			case 2:
+				chatWithEveryone();
+				break;
+			case 3:
+				this.exit = true;
+				break;
+			case 4:
+				break;
+			default:
+				this.sendMessage("Invalid choice.");
+				break;
+			}
 
+		}
+		if (!this.exit) {
+			sendClientMessage();
+			this.requestPending = false;
+		}
+		System.out.println("izasao iz menija");
+		
+		
 
-    private void menue() throws IOException { // ovo ce morati biti tred jer se rad mora prekinuti kad dodje zahtjev za igru
-        while(!requestPending){ // dok nema zahtjeva za igru
+	}
 
-                this.sendMessage("1. Choose user to play a game\n2. Chat with everyone\n3. Exit\n4. pomocni");
-                int choiceInt = getValidInteger();
+	private void chatWithEveryone() {
+		// subscribe to general channel
+		Channel channel = this.server.getChannelByName("general");
+		channel.subscribe(this);
+		this.currentChannel = channel;
+		this.requestPending = true;
+	}
 
-                switch (choiceInt) {
-                    case 1:
-                        playGame();
-                        break;
-                    case 2:
-                        chatWithEveryone();
-                        break;
-                    case 3:
-                        this.exit = true;
-                        break;
-                    case 4:
-                        break;
-                    default:
-                        this.sendMessage("Invalid choice.");
-                        break;
-                }
+	private void playGame() {
+		// choose user to play a game with
+		String usernameOpponent = getUsernameOpponent();
 
-            }
+		// send request to opponent
+		boolean accepted = this.server.sendRequestTo(usernameOpponent, this.username);
+		if (accepted) {
+			this.requestPending = true;
+			this.sendMessage("Request accepted.");
+		} else
+			this.sendMessage("Request rejected.");
+	}
 
-        System.out.println("izasao iz menija");
-        sendClientMessage();
-        this.requestPending = false;
-        
+	private String getUsernameOpponent() {
 
-    }
+		List<String> usernames = getUserNamesOfOpponents();
 
+		// wait for users to connect
+		usernames = ifNoUsersConnectedWait(usernames);
 
-    private void chatWithEveryone() {
-        // subscribe to general channel
-        Channel channel = this.server.getChannelByName("general");
-        channel.subscribe(this);
-        this.currentChannel = channel;
-        this.requestPending = true;
-    }
+		// ask user to choose opponent
+		this.sendMessage("Chose from 0 to " + (usernames.size() - 1) + ". \nConnected users: " + usernames);
 
+		// get index of opponent
+		int userIndex = getValidInteger();
+		while (userIndex < 0 || userIndex >= usernames.size()) {
+			this.sendMessage(
+					"Invalid index. Chose from 0 to " + (usernames.size() - 1) + ". Connected users: " + usernames);
+			userIndex = getValidInteger();
+		}
+		return usernames.get(userIndex);
+	}
 
-    private void playGame() {
-        // choose user to play a game with
-        String usernameOpponent = getUsernameOpponent();
+	private int getValidInteger() {
 
-        
-        // send request to opponent
-        boolean accepted = this.server.sendRequestTo(usernameOpponent, this.username);
-        if (accepted){
-            this.requestPending = true;
-            this.sendMessage("Request accepted.");
-        } else
-            this.sendMessage("Request rejected.");
-    }
+		int userIndex = -1;
+		while (!this.exit) {
+			this.sendMessage(" Enter an integer: ");
+			try {
+				userIndex = Integer.parseInt(readFromUser());
+				break; // Exit loop on successful parsing
+			} catch (NumberFormatException e) {
+				this.sendMessage("Invalid input. Please enter a valid integer.");
+			}
+		}
+		return userIndex;
+	}
 
+	private List<String> ifNoUsersConnectedWait(List<String> usernames) {
+		if (usernames.size() == 0) {
+			this.sendMessage("No other users connected. Wait for someone to connect.");
+		}
+		while (usernames.size() == 0) { // ovo se moze rijesiti i sa wait() i notify()
+			try {
+				sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			usernames = getUserNamesOfOpponents();
 
+		}
+		return usernames;
+	}
 
+	/*
+	 * private void getUsername(List<String> usernames) throws IOException { // Ask
+	 * for username until it is unique this.sendMessage("Enter your username: ");
+	 * while (usernames.contains(this.username = fromUser.readLine())) {
+	 * this.sendMessage("Username is taken. Please choose a different username: ");
+	 * }
+	 * 
+	 * }
+	 */
 
-    private String getUsernameOpponent() {
+	private List<String> getUserNamesOfOpponents() {
+		List<String> usernames = this.server.getUserNames();
+		usernames.remove(this.username);
+		return usernames;
+	}
 
-        List<String> usernames = getUserNamesOfOpponents();
+	private void sendClientMessage() throws IOException {
+		String clientMessage;
+		do {
+			// Read message from user
+			clientMessage = fromUser.readLine();
+			if (clientMessage == null)
+				break;
 
-        // wait for users to connect
-        usernames = ifNoUsersConnectedWait(usernames);
+			// Broadcast the message
+			this.currentChannel.publish(this, "[" + this.username + "]: " + clientMessage);
 
-        // ask user to choose opponent
-        this.sendMessage("Chose from 0 to " + (usernames.size()-1) + ". \nConnected users: " + usernames);
+		} while (!clientMessage.equals("bye"));
 
-        // get index of opponent
-        int userIndex = getValidInteger();
-        while (userIndex < 0 || userIndex >= usernames.size()) {
-            this.sendMessage("Invalid index. Chose from 0 to " + (usernames.size()-1) + ". Connected users: " + usernames);
-            userIndex = getValidInteger();
-        }
-        return usernames.get(userIndex);
-    }
+		// remove the user and subscribe to menu
+		this.currentChannel.unsubscribe(this);
+		// this.server.subscribeToMenu(this);
+	}
 
+	void sendMessage(String message) {
+		if (this.toUser != null)
+			this.toUser.println(message);
+		else
+			System.out.println("Error sending message to user " + this.username);
+	}
 
-    private int getValidInteger() {
-        
-        int userIndex;
-        while (true) {
-            this.sendMessage(" Enter an integer: ");
-            try {
-                userIndex = Integer.parseInt(readFromUser());
-                break; // Exit loop on successful parsing
-            } catch (NumberFormatException e) {
-                this.sendMessage("Invalid input. Please enter a valid integer.");
-            }
-        }
-        return userIndex;
-    }
+	public void receiveMessage(String message) {
+		this.sendMessage(message);
+	}
 
+	public String readFromUser() {
+		String response = null;
+		try {
+			response = fromUser.readLine();
+		} catch (IOException e) {
+			System.out.println("Error reading from user: " + e.getMessage());
+			this.exit = true;
+		}
+		return response;
+	}
 
-    private List<String> ifNoUsersConnectedWait(List<String> usernames) {
-        if (usernames.size() == 0) {
-            this.sendMessage("No other users connected. Wait for someone to connect.");
-        }
-        while (usernames.size() == 0) { // ovo se moze rijesiti i sa wait() i notify()
-            try {
-                sleep(5000);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            usernames = getUserNamesOfOpponents();
-            
-        }
-        return usernames;
-    }
+	String getNickname() {
+		return this.username;
+	}
 
-/*
-    private void getUsername(List<String> usernames) throws IOException {
-        // Ask for username until it is unique
-        this.sendMessage("Enter your username: ");
-        while (usernames.contains(this.username = fromUser.readLine())) {
-            this.sendMessage("Username is taken. Please choose a different username: ");
-        }
+	public boolean receveRequest(String message, String usernameOpponent) {
 
-    }
- */
+		this.requestPending = true;
 
-    private List<String> getUserNamesOfOpponents() {
-        List<String> usernames = this.server.getUserNames();
-        usernames.remove(this.username);
-        return usernames;
-    }
+		// show request to user
+		this.sendMessage(message);
 
+		// get response
+		String response = readFromUser();
+		System.out.println(response);
+		if (response.equals("yes")) {
+			// get opponent
+			UserThread opponent = this.server.getUserByName(usernameOpponent);
 
-    private void sendClientMessage() throws IOException {
-        String clientMessage;
-        do {
-            // Read message from user
-            clientMessage = fromUser.readLine();
-            if (clientMessage == null)
-                break;
+			// create channel and subscribe users to it
+			Channel channel = new Channel(this.username + " " + usernameOpponent, this, opponent);
+			this.server.addChannel(channel);
 
-            // Broadcast the message
-            this.currentChannel.publish(this, "[" + this.username + "]: " + clientMessage);
-            
-        } while (!clientMessage.equals("bye"));
+			// set current channel
+			opponent.currentChannel = channel;
+			this.currentChannel = channel;
 
-        // remove the user and subscribe to menu
-        this.currentChannel.unsubscribe(this);
-        //this.server.subscribeToMenu(this);
-    }
+			return true;
+		}
 
-    void sendMessage(String message) {
-        if (this.toUser != null)
-            this.toUser.println(message);
-        else
-            System.out.println("Error sending message to user " + this.username);
-    }
-    public void receiveMessage(String message) {
-        this.sendMessage(message);
-    }
+		else
+			return false;
 
-    public String readFromUser() {
-        String response = null;
-        try {
-            response = fromUser.readLine();
-        } catch (IOException e) {
-            System.out.println("Error reading from user: " + e.getMessage());
-        }
-        return response;
-    }
+	}
 
-    String getNickname() {
-        return this.username;
-    }
+	private void initiateRequest() {
 
-    public boolean receveRequest(String message, String usernameOpponent) {
+	}
 
+	public void subscribeToChannel(String channelName) {
+		Channel channel = this.server.getChannelByName(channelName);
+		if (channel != null)
+			this.currentChannel = channel;
+		else
+			this.sendMessage("Channel " + channelName + " does not exist.");
 
-        this.requestPending = true;
+	}
 
-        // show request to user
-        this.sendMessage(message);
+	public void unsubscribeFromChannel(Channel channel) {
+		subscribedChannels.remove(channel);
+		channel.unsubscribe(this);
+	}
 
-        // get response
-        String response = readFromUser();
-        System.out.println(response);
-        if (response.equals("yes"))
-        {
-            // get opponent
-            UserThread opponent = this.server.getUserByName(usernameOpponent);
+	public void sendMessageToChannel(String channelName, String message) {
+		// Find the channel and publish the message
+		// Handle interruptions if necessary
+	}
 
-            // create channel and subscribe users to it
-            Channel channel = new Channel(this.username+" "+usernameOpponent, this, opponent);
-            this.server.addChannel(channel);
-
-            // set current channel
-            opponent.currentChannel = channel;
-            this.currentChannel = channel;
-
-            return true;
-        }
-            
-        else
-            return false;
-        
-    }
-
-
-    private void initiateRequest() {
-        
-            
-        
-    }
-
-
-    
-
-    public void subscribeToChannel(String channelName) {
-        Channel channel = this.server.getChannelByName(channelName);
-        if (channel != null)
-            this.currentChannel = channel;
-        else
-            this.sendMessage("Channel " + channelName + " does not exist.");
-
-    }
-
-    public void unsubscribeFromChannel(Channel channel) {
-        subscribedChannels.remove(channel);
-        channel.unsubscribe(this);
-    }
-
-    public void sendMessageToChannel(String channelName, String message) {
-        // Find the channel and publish the message
-        // Handle interruptions if necessary
-    }
-
-
-    public String getUsername() {
-        return this.username;
-    }
+	public String getUsername() {
+		return this.username;
+	}
 }
