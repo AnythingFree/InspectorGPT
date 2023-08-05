@@ -5,9 +5,9 @@ import java.util.List;
 
 public class Channel {
     private final String name;
-    private final List<UserThread> subscribers; 
+    private final List<UserThread> subscribers;
     private final UserThread player1, player2;
-    
+
 
     public Channel(String name) {
         this.name = name;

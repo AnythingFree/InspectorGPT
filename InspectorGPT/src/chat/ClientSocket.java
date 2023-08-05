@@ -15,7 +15,7 @@ public class ClientSocket {
     }
 
     public void close() {
-    	
+
     	System.err.println("Zatvara se soket...");
         try {
 			socket.close();

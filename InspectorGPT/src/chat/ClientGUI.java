@@ -1,5 +1,12 @@
 package chat;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -10,14 +17,6 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class ClientGUI extends Application {
 
@@ -136,19 +135,19 @@ public class ClientGUI extends Application {
 
 	/*
 	 * private String connectToServer() {
-	 * 
+	 *
 	 * try (Socket socket = new Socket("localhost", ChatServer.SERVER_TEST_PORT)) {
-	 * 
+	 *
 	 * System.out.println("Connected to the chat server @ " +
 	 * ChatServer.SERVER_TEST_PORT);
-	 * 
+	 *
 	 * // get connected users BufferedReader read = new BufferedReader(new
 	 * InputStreamReader(socket.getInputStream())); String usernames =
 	 * read.readLine();
-	 * 
+	 *
 	 * this.socket = socket; return usernames;
-	 * 
-	 * 
+	 *
+	 *
 	 * } catch (IOException e) { e.printStackTrace(); } return null; }
 	 */
 	private List<String> getUserList(String usernames) {

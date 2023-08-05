@@ -3,7 +3,6 @@ package chat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -34,15 +33,15 @@ final class ChatClient {
     // konektuje se na server, postavlja se ime, pokrecu se tredovi, cekaju se tredovi
     void execute() {
         try {
-            
+
             try (Socket socket = new Socket(this.hostname, this.port)) {
-            	
+
                 //System.out.println("Connected to the chat server @ " + this.hostname);
 
                 // get connected users
                 BufferedReader read = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 String usernames = read.readLine();
-                
+
 
                 // print connected users
                 System.out.println("\rConnected users: " +  usernames);
@@ -56,14 +55,14 @@ final class ChatClient {
                     System.out.println("Username is taken. Please choose a different username: ");
                     setName();
                 }
-                
+
                 // ovo sve iznad radimo ovde u klijentu jer this.name treba da se prosledi u tredove
                 // dispatch threads
                 getWt(socket);
-                
 
 
-                
+
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

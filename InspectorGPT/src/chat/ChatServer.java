@@ -1,8 +1,14 @@
 package chat;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 final class ChatServer {
@@ -19,7 +25,7 @@ final class ChatServer {
     private final Set<UserThread> users;
 
     private List<Channel> allChannels = new ArrayList<>();
-    
+
 
 
     ChatServer(int port) {
@@ -39,7 +45,7 @@ final class ChatServer {
                 Socket client = server.accept();
                 System.err.println("Client connected.");
 
-                // We dispatch a new thread for each user in the chat 
+                // We dispatch a new thread for each user in the chat
                 UserThread user = new UserThread(client, this);
                 this.users.add(user);
                 user.start();
@@ -66,15 +72,15 @@ final class ChatServer {
     public boolean sendRequestTo(String usernameOpponent, String username) {
         Optional<UserThread> foundUser;
         synchronized (this.users) {
-            foundUser = 
+            foundUser =
                     this.users.stream()
                     .filter(u -> u.getNickname().equals(usernameOpponent))
-                    .findFirst();             
+                    .findFirst();
         }
 
         String message = "Do you want to play a game with " + username + "? (yes/no)";
 
-        boolean response = false; 
+        boolean response = false;
         if (foundUser.isPresent()) {
 
             //foundUser.get().interrupt();
@@ -125,10 +131,10 @@ final class ChatServer {
     }
 
 
-    
-    
 
 
-    
-    
+
+
+
+
 }

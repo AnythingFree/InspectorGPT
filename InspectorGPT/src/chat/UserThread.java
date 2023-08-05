@@ -1,7 +1,10 @@
 package chat;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,16 +35,21 @@ final class UserThread extends Thread {
 	@Override
     public void run() {
         try {
-            
-            
+
+
             // send connected users list
             List<String> usernames = this.server.getUserNames();
             this.sendMessage(usernames.toString());
-            
+
             // get username
             this.username = fromUser.readLine();  // ovo dobijas od clientwriteThreada
             System.err.println("Client username: " + username);
-            
+
+            // send initial Hello-message to user
+			this.sendMessage("Hello, " + username + "!");
+			this.sendMessage("You are connected to the chat server @ " + ChatServer.SERVER_TEST_PORT);
+			this.sendMessage("Users connected: " + usernames.toString());
+
             //=============================================
             // menue
             /*
@@ -98,8 +106,8 @@ final class UserThread extends Thread {
 			this.requestPending = false;
 		}
 		System.out.println("izasao iz menija");
-		
-		
+
+
 
 	}
 
@@ -182,7 +190,7 @@ final class UserThread extends Thread {
 	 * while (usernames.contains(this.username = fromUser.readLine())) {
 	 * this.sendMessage("Username is taken. Please choose a different username: ");
 	 * }
-	 * 
+	 *
 	 * }
 	 */
 

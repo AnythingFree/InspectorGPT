@@ -3,7 +3,6 @@ package chat;
 import javafx.application.Application;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
-import javafx.scene.Scene;
 
 public class UsernameInputDialog extends Application {
 

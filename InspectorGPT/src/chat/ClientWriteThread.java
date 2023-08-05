@@ -1,8 +1,8 @@
 package chat;
 
-import java.io.*;
-import java.net.*;
-import java.util.Scanner;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import javafx.scene.control.TextField;
 
 final class ClientWriteThread extends Thread {

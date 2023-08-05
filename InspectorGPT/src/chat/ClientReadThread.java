@@ -1,7 +1,8 @@
 package chat;
 
-import java.io.*;
-import java.net.Socket;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import javafx.application.Platform;
 
@@ -27,9 +28,9 @@ final class ClientReadThread extends Thread {
 		// Continuously receive and print messages from the server
 		while (!Thread.currentThread().isInterrupted()) {
 			try {
-				// Wait for message and print it 
+				// Wait for message and print it
 				String response = this.fromServer.readLine(); // this is blocking IO
-				
+
 				if (response == null) {
 					Platform.runLater(() -> {
 						System.out.println("Connection lost");
@@ -46,10 +47,10 @@ final class ClientReadThread extends Thread {
 			} catch (IOException ex) {
 				System.out.println("ReadThread was interrupted while waiting for server input.");
 				break;
-			} 
+			}
 		}
-		
+
 		System.err.println("ReadThread [" + this.username + "] closing...");
-		
+
 	}
 }
