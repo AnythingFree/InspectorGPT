@@ -44,11 +44,13 @@ final class UserThread extends Thread {
             
             //=============================================
             // menue
+            /*
             while(this.exit == false){
                 menue();
             }
-            System.out.println("ovde");
-            
+            */
+            chatWithEveryone();
+            sendClientMessages();
 
         } catch (IOException ex) {
             System.out.println("Error in UserThread: " + ex.getMessage());
@@ -92,7 +94,7 @@ final class UserThread extends Thread {
 
 		}
 		if (!this.exit) {
-			sendClientMessage();
+			sendClientMessages();
 			this.requestPending = false;
 		}
 		System.out.println("izasao iz menija");
@@ -190,7 +192,7 @@ final class UserThread extends Thread {
 		return usernames;
 	}
 
-	private void sendClientMessage() throws IOException {
+	private void sendClientMessages() throws IOException {
 		String clientMessage;
 		do {
 			// Read message from user

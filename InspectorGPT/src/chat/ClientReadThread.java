@@ -27,31 +27,29 @@ final class ClientReadThread extends Thread {
 		// Continuously receive and print messages from the server
 		while (!Thread.currentThread().isInterrupted()) {
 			try {
-				// Wait for message and print it
-				String response = this.fromServer.readLine();
-
+				// Wait for message and print it 
+				String response = this.fromServer.readLine(); // this is blocking IO
+				
 				if (response == null) {
 					Platform.runLater(() -> {
-						chatClientGUI.appendToChatArea("\rConnection lost!");
+						System.out.println("Connection lost");
+						chatClientGUI.appendToChatArea("Connection lost!");
 					});
 					return;
 				}
 
 				// Update the GUI with the received message
 				Platform.runLater(() -> {
-					chatClientGUI.appendToChatArea("\r" + response);
+					chatClientGUI.appendToChatArea(response);
 				});
 
-				// Print prompt
-				System.out.printf("\r[%s]: read thread", this.username);
 			} catch (IOException ex) {
-				System.out.println("Error reading from server: " + ex.getMessage());
-				ex.printStackTrace();
+				System.out.println("ReadThread was interrupted while waiting for server input.");
 				break;
-			}
+			} 
 		}
-
-		System.out.println("ThreadRead was interrupted while working.");
-
+		
+		System.err.println("ReadThread [" + this.username + "] closing...");
+		
 	}
 }

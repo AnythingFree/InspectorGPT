@@ -44,24 +44,22 @@ final class ClientWriteThread extends Thread {
 
 				try {
 					lock.wait();
+
+					// Get text from the GUI input field
+					text = inputField.getText();
+
+					if (!text.isEmpty())
+						// sent to server
+						this.toServer.println(text);
+
 				} catch (InterruptedException e) {
-					System.out.println("ThreadWrite was interrupted while waiting.");
+					System.out.println("WriteThread was interrupted while in waiting state.");
 					break;
-
 				}
-
-				// Get text from the GUI input field
-				text = inputField.getText();
-
-				if (!text.isEmpty())
-					// sent to server
-					this.toServer.println(text);
-
-				// Clear the input field
-				inputField.clear();
 
 			}
 
 		}
+		System.err.println("WriteThread [" + this.username + "] closing...");
 	}
 }

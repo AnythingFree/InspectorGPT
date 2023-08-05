@@ -14,7 +14,13 @@ public class ClientSocket {
         return socket;
     }
 
-    public void close() throws IOException {
-        socket.close();
+    public void close() {
+    	
+    	System.err.println("Zatvara se soket...");
+        try {
+			socket.close();
+		} catch (IOException e) {
+			System.out.println("Greska pri zatvaranju client soketa.");
+		}
     }
 }

@@ -20,63 +20,55 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ClientGUI extends Application {
-	
-	
 
 	private String name;
 	private TextArea chatArea;
 	private TextField inputField;
-	
+
 	private Thread rt;
 	private Thread wt;
+
+	private ClientSocket clientSocket;
 
 	public static void main(String[] args) {
 		launch(args);
 	}
-	
 
 	@Override
 	public void start(Stage primaryStage) {
-		
+
 		// connect to server
 		try {
-			
-			ClientSocket clientSocket = new ClientSocket("localhost", ChatServer.SERVER_TEST_PORT);
 
-			
+			clientSocket = new ClientSocket("localhost", ChatServer.SERVER_TEST_PORT);
+
 			System.out.println("Connected to the chat server @ " + ChatServer.SERVER_TEST_PORT);
 
 			// get connected users
 			BufferedReader read = new BufferedReader(new InputStreamReader(clientSocket.getSocket().getInputStream()));
 			String usernames = read.readLine();
-			
+
 			// make connected users list
 			List<String> userList = getUserList(usernames);
-				
-			
-			// Create and initiate TextInputDialog for username input 
-			textInputDialogForUsername(userList); 
 
-		
+			// Create and initiate TextInputDialog for username input
+			textInputDialogForUsername(userList);
+
 			// main window
 			setMainWindow(primaryStage);
 			primaryStage.show();
-			
-			
+
 			// Dispatch threads
 			getWt(clientSocket);
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		
-
-
 	}
 
 	private void setMainWindow(Stage primaryStage) {
-		
+
 		primaryStage.setTitle("Chat Client");
 		BorderPane layout = new BorderPane();
 
@@ -93,17 +85,19 @@ public class ClientGUI extends Application {
 		Scene scene = new Scene(layout, 400, 300);
 		primaryStage.setScene(scene);
 		primaryStage.setOnCloseRequest(e -> {
-			
+
+			this.clientSocket.close();
+
 			this.rt.interrupt();
 			this.wt.interrupt();
-			
+
 			Platform.exit();
 			System.exit(0);
 		});
 	}
 
 	private void textInputDialogForUsername(List<String> userList) {
-				
+
 		// create and manage usernameDialog
 		TextInputDialog usernameDialog = new TextInputDialog();
 		usernameDialog.setTitle("Username Input");
@@ -119,12 +113,12 @@ public class ClientGUI extends Application {
 				if (username.isEmpty()) {
 					// If username is empty, show the dialog again
 					usernameDialog.setHeaderText("Username cannot be empty.");
-					
-				}else if (userList.contains(username)) {
+
+				} else if (userList.contains(username)) {
 					// If usernmae is taken, show the dialog again
 					usernameDialog.setHeaderText("Username is taken. Please choose a different username.");
-					
-				}else {
+
+				} else {
 					// Set the entered username and exit the loop
 					this.name = username;
 					validUsername[0] = true;
@@ -139,27 +133,24 @@ public class ClientGUI extends Application {
 			}
 		}
 	}
-/*
-	private String connectToServer() {
 
-		try (Socket socket = new Socket("localhost", ChatServer.SERVER_TEST_PORT)) {
-
-			System.out.println("Connected to the chat server @ " + ChatServer.SERVER_TEST_PORT);
-
-			// get connected users
-			BufferedReader read = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			String usernames = read.readLine();
-			
-			this.socket = socket;
-			return usernames;
-
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-*/
+	/*
+	 * private String connectToServer() {
+	 * 
+	 * try (Socket socket = new Socket("localhost", ChatServer.SERVER_TEST_PORT)) {
+	 * 
+	 * System.out.println("Connected to the chat server @ " +
+	 * ChatServer.SERVER_TEST_PORT);
+	 * 
+	 * // get connected users BufferedReader read = new BufferedReader(new
+	 * InputStreamReader(socket.getInputStream())); String usernames =
+	 * read.readLine();
+	 * 
+	 * this.socket = socket; return usernames;
+	 * 
+	 * 
+	 * } catch (IOException e) { e.printStackTrace(); } return null; }
+	 */
 	private List<String> getUserList(String usernames) {
 		List<String> userList = new ArrayList<>();
 		if (!usernames.equals("[null]")) {
@@ -176,14 +167,12 @@ public class ClientGUI extends Application {
 		return userList;
 	}
 
-
 	private void getWt(ClientSocket clientSocket) {
 		this.rt = new ClientReadThread(this.name, clientSocket, this);
 		this.wt = new ClientWriteThread(this.name, clientSocket, this.inputField);
 		rt.start();
 		wt.start();
-		
-		
+
 	}
 
 	private void sendMessage() {
@@ -197,13 +186,14 @@ public class ClientGUI extends Application {
 				System.out.println("wt nije ziv");
 
 			// write to chat
-			appendToChatArea(message + "\n");
+			appendToChatArea("[" + this.name + "]" + message + "\n");
 
+			// clear the inputfield
 			inputField.clear();
 		}
 	}
 
 	public void appendToChatArea(String message) {
-		chatArea.appendText(message);
+		chatArea.appendText(message + "\n");
 	}
 }
