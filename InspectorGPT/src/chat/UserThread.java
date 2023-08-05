@@ -47,7 +47,6 @@ final class UserThread extends Thread {
 
             // send initial Hello-message to user
 			this.sendMessage("Hello, " + username + "!");
-			this.sendMessage("You are connected to the chat server @ " + ChatServer.SERVER_TEST_PORT);
 			this.sendMessage("Users connected: " + usernames.toString());
 
             //=============================================
