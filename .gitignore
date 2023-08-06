@@ -1,0 +1,8 @@
+# Ignore .env files
+.env
+
+# Ignore compiled Java class files
+*.class
+
+# Ignore log files
+*.log

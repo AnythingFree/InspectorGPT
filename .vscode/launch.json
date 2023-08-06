@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "JavaRunCommand",
+            "request": "launch",
+            "mainClass": "GPT.JavaRunCommand",
+            "projectName": "VS-InspectorGPT_b40fc9cf"
+        },
+        {
+            "type": "java",
+            "name": "JavaRunCommand",
+            "request": "launch",
+            "mainClass": "JavaRunCommand",
+            "projectName": "VS-InspectorGPT_b40fc9cf"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"
@@ -46,7 +60,6 @@
             "mainClass": "test.Test",
             "projectName": "VS-InspectorGPT_b40fc9cf",
             "vmArgs": "--module-path \"C:\\Program Files\\Java\\javafx-sdk-20.0.2\\lib\" --add-modules javafx.controls,javafx.fxml"
-        
         }
     ]
 }
