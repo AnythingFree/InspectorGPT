@@ -1,4 +1,4 @@
-package chat;
+package server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,47 +33,46 @@ final class UserThread extends Thread {
 	}
 
 	@Override
-    public void run() {
-        try {
+	public void run() {
+		try {
 
+			// send connected users list
+			List<String> usernames = this.server.getUserNames();
+			this.sendMessage(usernames.toString());
 
-            // send connected users list
-            List<String> usernames = this.server.getUserNames();
-            this.sendMessage(usernames.toString());
+			// get username
+			this.username = fromUser.readLine(); // ovo dobijas od clientwriteThreada
+			System.err.println("Client username: " + this.username);
 
-            // get username
-            this.username = fromUser.readLine();  // ovo dobijas od clientwriteThreada
-            System.err.println("Client username: " + username);
-
-            // send initial Hello-message to user
+			// send initial Hello-message to user
 			this.sendMessage("Hello, " + username + "!");
 			this.sendMessage("Users connected: " + usernames.toString());
 
-            //=============================================
-            // menue
-            /*
-            while(this.exit == false){
-                menue();
-            }
-            */
-            chatWithEveryone();
-            sendClientMessages();
+			// =============================================
+			// menue
+			/*
+			 * while(this.exit == false){
+			 * menue();
+			 * }
+			 */
+			chatWithEveryone();
+			sendClientMessages();
 
-        } catch (IOException ex) {
-            System.out.println("Error in UserThread: " + ex.getMessage());
-            ex.printStackTrace();
-        } finally {
-            // Remove user from set
-        	this.server.remove(this);
+		} catch (IOException ex) {
+			System.out.println("Error in UserThread: " + ex.getMessage());
 
-            // Close socket
-            try {
-                this.sock.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+		} finally {
+			// Remove user from set
+			this.server.remove(this);
+
+			// Close socket
+			try {
+				this.sock.close();
+			} catch (IOException e) {
+				System.out.println("Socket could not be closed." + e.getMessage());
+			}
+		}
+	}
 
 	private void menue() throws IOException { // ovo ce morati biti tred jer se rad mora prekinuti kad dodje zahtjev za
 												// igru
@@ -83,20 +82,20 @@ final class UserThread extends Thread {
 			int choiceInt = getValidInteger();
 
 			switch (choiceInt) {
-			case 1:
-				playGame();
-				break;
-			case 2:
-				chatWithEveryone();
-				break;
-			case 3:
-				this.exit = true;
-				break;
-			case 4:
-				break;
-			default:
-				this.sendMessage("Invalid choice.");
-				break;
+				case 1:
+					playGame();
+					break;
+				case 2:
+					chatWithEveryone();
+					break;
+				case 3:
+					this.exit = true;
+					break;
+				case 4:
+					break;
+				default:
+					this.sendMessage("Invalid choice.");
+					break;
 			}
 
 		}
@@ -105,8 +104,6 @@ final class UserThread extends Thread {
 			this.requestPending = false;
 		}
 		System.out.println("izasao iz menija");
-
-
 
 	}
 

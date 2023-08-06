@@ -1,4 +1,4 @@
-package chat;
+package client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,9 +39,9 @@ public class ClientGUI extends Application {
 		// connect to server
 		try {
 
-			clientSocket = new ClientSocket("localhost", ChatServer.SERVER_TEST_PORT);
+			clientSocket = new ClientSocket("localhost", 5000);
 
-			System.out.println("Connected to the chat server @ " + ChatServer.SERVER_TEST_PORT);
+			System.out.println("Connected to the chat server @ " +  5000);
 
 			// get connected users
 			BufferedReader read = new BufferedReader(new InputStreamReader(clientSocket.getSocket().getInputStream()));
@@ -133,23 +133,6 @@ public class ClientGUI extends Application {
 		}
 	}
 
-	/*
-	 * private String connectToServer() {
-	 *
-	 * try (Socket socket = new Socket("localhost", ChatServer.SERVER_TEST_PORT)) {
-	 *
-	 * System.out.println("Connected to the chat server @ " +
-	 * ChatServer.SERVER_TEST_PORT);
-	 *
-	 * // get connected users BufferedReader read = new BufferedReader(new
-	 * InputStreamReader(socket.getInputStream())); String usernames =
-	 * read.readLine();
-	 *
-	 * this.socket = socket; return usernames;
-	 *
-	 *
-	 * } catch (IOException e) { e.printStackTrace(); } return null; }
-	 */
 	private List<String> getUserList(String usernames) {
 		List<String> userList = new ArrayList<>();
 		if (!usernames.equals("[null]")) {
@@ -185,7 +168,7 @@ public class ClientGUI extends Application {
 				System.out.println("wt nije ziv");
 
 			// write to chat
-			appendToChatArea("[" + this.name + "]" + message + "\n");
+			appendToChatArea("[" + this.name + "]: " + message + "\n");
 
 			// clear the inputfield
 			inputField.clear();

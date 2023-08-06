@@ -1,4 +1,4 @@
-package chat;
+package client;
 
 import javafx.application.Application;
 import javafx.scene.control.TextInputDialog;

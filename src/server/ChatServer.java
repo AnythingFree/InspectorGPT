@@ -1,4 +1,4 @@
-package chat;
+package server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -14,19 +14,15 @@ import java.util.stream.Collectors;
 final class ChatServer {
     static final int SERVER_TEST_PORT = 5000;
 
-
     public static void main(String[] args) {
         ChatServer server = new ChatServer(SERVER_TEST_PORT);
         server.execute();
     }
 
-
     private final int port;
     private final Set<UserThread> users;
 
     private List<Channel> allChannels = new ArrayList<>();
-
-
 
     ChatServer(int port) {
         this.port = port;
@@ -35,12 +31,11 @@ final class ChatServer {
         this.allChannels.add(new Channel("0"));
     }
 
-
     void execute() {
         try (ServerSocket server = new ServerSocket(port)) {
             System.err.println("Chat server is listening on port: " + port);
 
-            //noinspection InfiniteLoopStatement
+            // noinspection InfiniteLoopStatement
             while (true) {
                 Socket client = server.accept();
                 System.err.println("Client connected.");
@@ -68,12 +63,10 @@ final class ChatServer {
         }
     }
 
-
     public boolean sendRequestTo(String usernameOpponent, String username) {
         Optional<UserThread> foundUser;
         synchronized (this.users) {
-            foundUser =
-                    this.users.stream()
+            foundUser = this.users.stream()
                     .filter(u -> u.getNickname().equals(usernameOpponent))
                     .findFirst();
         }
@@ -83,7 +76,7 @@ final class ChatServer {
         boolean response = false;
         if (foundUser.isPresent()) {
 
-            //foundUser.get().interrupt();
+            // foundUser.get().interrupt();
             response = foundUser.get().receveRequest(message, username);
         }
 
@@ -115,9 +108,6 @@ final class ChatServer {
         }
     }
 
-
-
-
     public Channel getChannelByName(String channelName) {
         return this.allChannels.stream()
                 .filter(c -> c.getName().equals(channelName))
@@ -125,16 +115,8 @@ final class ChatServer {
                 .orElse(null);
     }
 
-
     public void addChannel(Channel channel) {
         this.allChannels.add(channel);
     }
-
-
-
-
-
-
-
 
 }
