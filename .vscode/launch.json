@@ -6,16 +6,16 @@
     "configurations": [
         {
             "type": "java",
-            "name": "JavaRunCommand",
+            "name": "_JsonUtil",
             "request": "launch",
-            "mainClass": "GPT.JavaRunCommand",
+            "mainClass": "client._JsonUtil",
             "projectName": "VS-InspectorGPT_b40fc9cf"
         },
         {
             "type": "java",
-            "name": "JavaRunCommand",
+            "name": "JsonUtil",
             "request": "launch",
-            "mainClass": "JavaRunCommand",
+            "mainClass": "client.JsonUtil",
             "projectName": "VS-InspectorGPT_b40fc9cf"
         },
         {
@@ -26,23 +26,16 @@
         },
         {
             "type": "java",
-            "name": "ChatClient",
+            "name": "JavaRunCommand",
             "request": "launch",
-            "mainClass": "chat.ChatClient",
-            "projectName": "VS-InspectorGPT_b40fc9cf"
-        },
-        {
-            "type": "java",
-            "name": "ChatServer",
-            "request": "launch",
-            "mainClass": "chat.ChatServer",
+            "mainClass": "GPT.JavaRunCommand",
             "projectName": "VS-InspectorGPT_b40fc9cf"
         },
         {
             "type": "java",
             "name": "ClientGUI",
             "request": "launch",
-            "mainClass": "chat.ClientGUI",
+            "mainClass": "client.ClientGUI",
             "projectName": "VS-InspectorGPT_b40fc9cf",
             "vmArgs": "--module-path \"C:\\Program Files\\Java\\javafx-sdk-20.0.2\\lib\" --add-modules javafx.controls,javafx.fxml"
         },
@@ -50,7 +43,14 @@
             "type": "java",
             "name": "UsernameInputDialog",
             "request": "launch",
-            "mainClass": "chat.UsernameInputDialog",
+            "mainClass": "client.UsernameInputDialog",
+            "projectName": "VS-InspectorGPT_b40fc9cf"
+        },
+        {
+            "type": "java",
+            "name": "ChatServer",
+            "request": "launch",
+            "mainClass": "server.ChatServer",
             "projectName": "VS-InspectorGPT_b40fc9cf"
         },
         {

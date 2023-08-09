@@ -1,6 +1,7 @@
 import openai
 import os
 from dotenv import load_dotenv
+import sys
 
 # Load environment variables from .env file
 load_dotenv("src\GPT\.env")
@@ -11,8 +12,8 @@ api_key = os.getenv("OPENAI_API_KEY")
 # Set your OpenAI API key
 openai.api_key = api_key
 
-# Prompt for text generation
-prompt = "Once upon a time in a land far, far away"
+# Get the prompt from command line arguments
+prompt = " ".join(sys.argv[1:])
 
 # Generate text using the GPT-3 model
 response = openai.Completion.create(

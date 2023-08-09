@@ -13,7 +13,7 @@ final class ClientWriteThread extends Thread {
 
 	private final Object lock = new Object();
 
-	ClientWriteThread(String username, ClientSocket clientSocket, TextField inputField) {
+	ClientWriteThread(String username, _ClientSocket clientSocket, TextField inputField) {
 		this.username = username;
 		this.inputField = inputField;
 
@@ -34,9 +34,6 @@ final class ClientWriteThread extends Thread {
 
 	@Override
 	public void run() {
-		// First send username, server expects that info
-		this.toServer.println(this.username);
-
 		String text;
 		while (!Thread.currentThread().isInterrupted()) {
 
@@ -50,7 +47,7 @@ final class ClientWriteThread extends Thread {
 
 					if (!text.isEmpty())
 						// sent to server
-						this.toServer.println(text);
+						this.toServer.println("["+ this.username +"]: "+ text);
 
 				} catch (InterruptedException e) {
 					System.out.println("WriteThread was interrupted while in waiting state.");

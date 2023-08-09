@@ -3,10 +3,10 @@ package client;
 import java.io.IOException;
 import java.net.Socket;
 
-public class ClientSocket {
+public class _ClientSocket {
     private Socket socket;
 
-    public ClientSocket(String serverAddress, int serverPort) throws IOException {
+    public _ClientSocket(String serverAddress, int serverPort) throws IOException {
         this.socket = new Socket(serverAddress, serverPort);
     }
 

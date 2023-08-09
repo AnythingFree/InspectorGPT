@@ -11,7 +11,7 @@ final class ClientReadThread extends Thread {
 	private String username;
 	private ClientGUI chatClientGUI; // Reference to the GUI
 
-	ClientReadThread(String username, ClientSocket clientSocket, ClientGUI chatClientGUI) {
+	ClientReadThread(String username, _ClientSocket clientSocket, ClientGUI chatClientGUI) {
 		this.username = username;
 		this.chatClientGUI = chatClientGUI;
 

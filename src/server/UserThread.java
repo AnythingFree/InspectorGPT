@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 final class UserThread extends Thread {
-	private final ChatServer server;
+	private final ServerThread server;
 	private final Socket sock;
 	private BufferedReader fromUser;
 	private PrintWriter toUser;
@@ -21,9 +21,9 @@ final class UserThread extends Thread {
 	private Channel currentChannel;
 	private boolean exit = false;
 
-	UserThread(Socket socket, ChatServer server) {
+	UserThread(Socket socket, ServerThread serverThread) {
 		this.sock = socket;
-		this.server = server;
+		this.server = serverThread;
 		try {
 			this.fromUser = new BufferedReader(new InputStreamReader(this.sock.getInputStream()));
 			this.toUser = new PrintWriter(this.sock.getOutputStream(), true);
@@ -44,10 +44,7 @@ final class UserThread extends Thread {
 			this.username = fromUser.readLine(); // ovo dobijas od clientwriteThreada
 			System.err.println("Client username: " + this.username);
 
-			// send initial Hello-message to user
-			this.sendMessage("Hello, " + username + "!");
-			this.sendMessage("Users connected: " + usernames.toString());
-
+			
 			// =============================================
 			// menue
 			/*
