@@ -6,130 +6,48 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
+import java.util.Map;
+
+import client._JsonUtil;
 
 final class ServerThread extends Thread {
     private BufferedReader reader;
     private PrintWriter writer;
-    private Socket client;
     private ChatServer server;
+    private Socket client;
 
     private String name;
     private Channel currentChannel;
     private int score = 0;
 
     public ServerThread(Socket client, ChatServer chatServer) {
-        this.client = client;
         this.server = chatServer;
+        this.client = client;
+        try {
+            this.reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            this.writer = new PrintWriter(client.getOutputStream(), true);
+        } catch (IOException e) {
+            System.out.println("Error getting input/output streams in serverThread : " + e.getMessage());
+        }
+
     }
 
     @Override
     public void run() {
 
+        String message;
         try {
-            reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            writer = new PrintWriter(client.getOutputStream(), true);
-
-            // get connected users and send it
-            List<String> usernames = this.server.getUserNames();
-            String data = getJsonFormating(usernames);
-            writer.println(data);
-
-            // get username from client
-            name = reader.readLine();
-
-            // MENUE
-            String userRequest;
-            while (true) {
-
-                userRequest = reader.readLine();
-                System.out.println("User request: " + userRequest);
-
-                switch (userRequest) {
-                    case ("1"):
-
-                        // subscribe to general channel
-                        Channel channel = this.server.getChannelByName("general");
-                        channel.subscribe(this);
-                        this.currentChannel = channel;
-
-                        // get connected users and send it
-                        usernames = this.server.getUsersFromChannel("general");
-                        writer.println("{type:chat; data:Connected users: " + usernames);
-
-                        // msm da je isti kao 0
-                        writeHello();
-
-                        // send messages to clients
-                        String mes;
-                        do {
-                            mes = reader.readLine();
-                            currentChannel.publish(this, mes);
-                        } while (!mes.equals("exit"));
-
-                        // unsubscribe from general channel
-                        channel.unsubscribe(this);
-                        this.currentChannel = null;
-
-                        break;
-                    case ("2"):
-                        // get connected users that are not playing a game and send it!!!!!!!!!!!!1
-                        // treba promjeniti u KOJI NE IGRAJU IGRU
-                        // ZA SAD NEK BUDE KOJI NEMAJU nista za CURRENTchannel
-                        usernames = this.server.getFreeUsers_Usernames(this);
-
-                        writer.println(getJsonFormating(usernames));
-
-                        // get opponent
-                        String opponent = reader.readLine();
-
-                        this.server.sendRequestTo(opponent, this.name);
-                        break;
-                    case ("3"):
-                        System.out.println("gleda druge meceve");
-                        break;
-                    case ("4"):
-                        String respond = reader.readLine();
-                        String opponentUsername = reader.readLine();
-                        if (respond.equals("yes")) {
-
-                            acceptRequest();
-                            this.server.acceptRequest(opponentUsername, this);
-                        } else {
-                            this.server.rejectRequest(opponentUsername);
-                        }
-                        break;
-                    case ("0"):
-
-                        writeHello();
-
-                        // send messages to clients
-                        String mess;
-                        do {
-                            mess = reader.readLine();
-
-                            if (mess != null)
-                                currentChannel.publish(this, mess);
-
-                            System.out.println(this.currentChannel.isGameFinished());
-
-                        } while (!mess.equals("exit") && !this.currentChannel.isGameFinished());
-
-                        signalGameFinished();
-
-                        // unsubscribe from channel
-                        this.currentChannel.unsubscribe(this);
-                        this.currentChannel = null;
-
-                        break;
-                }
-
+            while (!Thread.currentThread().isInterrupted()) {
+                message = reader.readLine();
+                handleIncomingMessage(message);
             }
         } catch (IOException e) {
-            System.err.println("IO Error in UserThread: " + e.getMessage());
+            System.err.println("Error reading message from client" + e.getMessage());
         } finally {
 
             if (this.currentChannel != null) {
                 this.currentChannel.unsubscribe(this);
+                this.currentChannel = null;
             }
 
             // Remove user from set
@@ -142,7 +60,113 @@ final class ServerThread extends Thread {
                 System.out.println("Socket could not be closed." + e.getMessage());
             }
 
+            System.err.println("Server thread stopped");
+
         }
+
+    }
+
+    private void handleIncomingMessage(String message) {
+        try {
+
+            // Parse the incoming JSON message
+            Map<String, String> resultMap = _JsonUtil.jsonToMap(message);
+
+            // Extract the "type" field from the JSON message
+            String messageType = resultMap.get("type").toString();
+
+            // Handle the message based on its type using a switch-case statement
+            List<String> usernames;
+            String data;
+            switch (messageType) {
+
+                case "setName":
+                    // get username from client
+                    this.name = resultMap.get("name").toString();
+                    break;
+
+                case "users":
+
+                    data = resultMap.get("data").toString();
+                    switch (data) {
+                        case "all":
+                            // get connected users on General channel
+                            usernames = this.server.getUserNames();
+                            writer.println(getJsonFormating(usernames));
+                            break;
+
+                        case "free":
+                            // ZA SAD NEK BUDE KOJI NEMAJU nista za CURRENTchannel
+                            usernames = this.server.getFreeUsers_Usernames(this);
+                            writer.println(getJsonFormating(usernames));
+                            break;
+
+                        case "inChannel":
+                            String channelName = resultMap.get("channelName").toString();
+                            usernames = this.server.getUsersFromChannel(channelName);
+                            writer.println(getJsonFormating(usernames));
+                            break;
+                    }
+                    break;
+
+                case "request":
+                    // get opponent
+                    String opponent = resultMap.get("opponent").toString();
+                    this.server.sendRequestTo(opponent, this.name);
+                    break;
+
+                case "response":
+                    String respond = resultMap.get("answ").toString();
+                    String opponentUsername = resultMap.get("opponent").toString();
+
+                    if (respond.equals("yes")) {
+                        acceptRequest();
+                        this.server.triggerAcceptRequest_prepareChannel(opponentUsername, this);
+                    } else {
+                        this.server.rejectRequest(opponentUsername);
+                    }
+                    break;
+
+                case "subsribe":
+                    // subscribe to channel
+                    Channel channel = this.server.getChannelByName(resultMap.get("channelName").toString());
+                    channel.subscribe(this);
+                    this.currentChannel = channel;
+                    break;
+
+                case "unsubscribe":
+                    // unsubscribe from channel
+                    this.currentChannel.unsubscribe(this);
+                    this.currentChannel = null;
+                    break;
+
+                case "publish":
+                    // publish message to channel
+                    String mesage = resultMap.get("message").toString();
+                    this.currentChannel.publish(this, mesage);
+                    break;
+
+                case "chatMode":
+                    writeHello();
+                    break;
+
+                case "gameFinished":
+                    signalGameFinished();
+                    break;
+
+                case "option3":
+                    break;
+
+                default:
+                    System.out.println("Unknown message type: " + messageType);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error in handleIncomingMessage [server]");
+            System.out.println(e.getMessage());
+
+        }
+
     }
 
     private void signalGameFinished() {
@@ -196,6 +220,10 @@ final class ServerThread extends Thread {
 
     public synchronized void setScore(int score) {
         this.score = score;
+    }
+
+    public void blokiraj() {
+        this.writer.println("{type:system; data:inputFiled}");
     }
 
 }

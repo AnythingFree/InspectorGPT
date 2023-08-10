@@ -13,7 +13,6 @@ import javafx.application.Platform;
 public class ThreadMessageListener extends Thread {
     private ClientGUI clientGUI;
     private BufferedReader reader;
-    private String message;
 
     public ThreadMessageListener(_ClientSocket clientSocket, ClientGUI clientGUI) {
         this.clientGUI = clientGUI;
@@ -28,6 +27,7 @@ public class ThreadMessageListener extends Thread {
 
     @Override
     public void run() {
+        String message;
         try {
             while (!Thread.currentThread().isInterrupted()) {
                 // Process the incoming message (update UI, handle requests, etc.)
@@ -109,7 +109,7 @@ public class ThreadMessageListener extends Thread {
                     System.out.println("Received unknown message type: " + messageType);
             }
         } catch (Exception e) {
-            System.out.println("Error in handleIncomingMessage");
+            System.out.println("Error in handleIncomingMessage [client]");
             System.out.println(e.getMessage());
 
         }

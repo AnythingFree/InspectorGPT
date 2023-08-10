@@ -101,6 +101,15 @@ public class Channel {
                 .forEach(u -> u.receiveMessage("GPT has been removed."));
         this.playerGPT = null;
 
+        // NEBLOKIRAJUCI IO TREBA ILI BOLJA ORGANIZACIJA SERVER TREDA
+        // moras da odblokiras korisnika2 jer se ceka na input
+        if (this.player1 == sender)
+            this.player2.blokiraj();
+        else 
+            this.player1.blokiraj();
+        
+        //================================
+
     }
 
     public boolean isHerePlayer(String username) {

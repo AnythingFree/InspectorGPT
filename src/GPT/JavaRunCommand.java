@@ -57,7 +57,8 @@ public class JavaRunCommand {
 
             // Wait for the process to finish
             int exitCode = process.waitFor();
-            //System.out.println("Python script finished with exit code: " + exitCode);
+            if (exitCode != 0)
+                System.out.println("Python script finished with exit code: " + exitCode);
 
             return output;
 

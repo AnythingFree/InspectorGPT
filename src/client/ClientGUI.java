@@ -56,6 +56,9 @@ public class ClientGUI extends Application {
 			this.messageListenerThread = new ThreadMessageListener(clientSocket, this);
 			messageListenerThread.start();
 
+			// ask for usernames
+			writer.println("type:start");
+
 			// Create and initiate TextInputDialog for username input
 			_UsernameInputDialog usernameInputDialog = new _UsernameInputDialog();
 			this.name = usernameInputDialog.getUsername(userList);

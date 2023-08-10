@@ -129,6 +129,13 @@ final class ChatServer {
         return null;
     }
 
+    private void prepareChannel(String opponentUsername, ServerThread user2, ServerThread user1) {
+        String name = user2.getUsername();
+
+        Channel channel = new Channel(name + " VS " + opponentUsername, user1, user2);
+        this.allChannels.add(channel);
+    }
+
     // ===gpt====
     public String askGPT(String message) {
         return JavaRunCommand.ask(message);
@@ -166,7 +173,7 @@ final class ChatServer {
         }
     }
 
-    public void acceptRequest(String opponentUsername, ServerThread user2) {
+    public void triggerAcceptRequest_prepareChannel(String opponentUsername, ServerThread user2) {
         Optional<ServerThread> user1;
 
         synchronized (this.users) {
@@ -179,10 +186,7 @@ final class ChatServer {
             user1.get().acceptRequest();
         }
 
-        String name = user2.getUsername();
-
-        Channel channel = new Channel(name + opponentUsername, user1.get(), user2);
-        this.allChannels.add(channel);
+        prepareChannel(opponentUsername, user2, user1.get());
     }
     // ======================================
 
