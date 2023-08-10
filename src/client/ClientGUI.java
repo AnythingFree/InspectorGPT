@@ -26,7 +26,7 @@ public class ClientGUI extends Application {
 	private TextArea chatArea;
 	private TextField inputField;
 
-	//private Thread rt;
+	// private Thread rt;
 	private Thread wt;
 	private ThreadMessageListener messageListenerThread;
 
@@ -34,7 +34,7 @@ public class ClientGUI extends Application {
 	private PrintWriter writer;
 
 	private List<String> userList;
-	
+
 	private Stage primaryStage;
 
 	public static void main(String[] args) {
@@ -57,14 +57,14 @@ public class ClientGUI extends Application {
 			messageListenerThread.start();
 
 			// ask for usernames
-			writer.println("type:start");
+			writer.println("{type:usernames; data:all}");
 
 			// Create and initiate TextInputDialog for username input
 			_UsernameInputDialog usernameInputDialog = new _UsernameInputDialog();
 			this.name = usernameInputDialog.getUsername(userList);
 
-			// Send username, server expects it
-			writer.println(this.name);
+			// Send username to server
+			writer.println("{type:setName; name:" + this.name + "}");
 
 			// main window
 			setMainWindow();
@@ -75,6 +75,7 @@ public class ClientGUI extends Application {
 		}
 
 	}
+
 	// ============================================================================
 	private void setMainWindow() throws IOException {
 		primaryStage.setTitle("Chat Client");
@@ -129,22 +130,26 @@ public class ClientGUI extends Application {
 		primaryStage.setScene(scene);
 
 		// Dispatch threads
-		//this.messageListenerThread.interrupt();
+		// this.messageListenerThread.interrupt();
 		getWt();
 
 		// Set the close request handler
 		primaryStage.setOnCloseRequest(e -> {
 			this.clientSocket.close();
 
-			//this.rt.interrupt();
+			// this.rt.interrupt();
 			this.wt.interrupt();
 
 			Platform.exit();
 			System.exit(0);
 		});
 
-		// javi serveru da je opcija 1
-		writer.println("1");
+		// subscribe to general channel
+		writer.println("{type:subscribe; channelName:general}");
+		// ask for usernames in channel
+		writer.println("{type:usernames; data:inChannel; channelName:general}");
+		// print usernames
+		appendToChatArea("Connected users: " + userList.toString());
 	}
 
 	private void handleOption2() {
@@ -152,7 +157,7 @@ public class ClientGUI extends Application {
 		System.out.println("Option 2 clicked");
 
 		// signal to server option 2
-		writer.println("2");
+		writer.println("{type:usernames; data:free}");
 
 		BorderPane userListLayout = new BorderPane();
 
@@ -218,18 +223,16 @@ public class ClientGUI extends Application {
 			// User accepted the game request
 			// Handle game initiation here
 			System.out.println("Prihvatam");
-			writer.println("4");
-			writer.println("yes");
-			writer.println(usernameOpponent);
+			writer.println("{type:response; answer:yes; opponent:" + usernameOpponent + "}");
 		} else {
 			// User declined the game request
 			System.out.println("Odbijam");
-			writer.println("4");
-			writer.println("no");
-			writer.println(usernameOpponent);
+			writer.println("{type:response; answer:no; opponent:" + usernameOpponent + "}");
+		
 		}
 	}
-	//============================================
+
+	// ============================================
 	public void playGame() {
 		// Code to handle Option 1
 		System.out.println("Playing game");
@@ -251,38 +254,39 @@ public class ClientGUI extends Application {
 		primaryStage.setScene(scene);
 
 		// Dispatch threads
-		//this.messageListenerThread.interrupt(); // ovo mi mozda pojede prvu poruku za kanal
+		// this.messageListenerThread.interrupt(); // ovo mi mozda pojede prvu poruku za
+		// kanal
 		getWt();
 
 		// Set the close request handler
 		primaryStage.setOnCloseRequest(e -> {
 			this.clientSocket.close();
 
-			//this.rt.interrupt();
+			// this.rt.interrupt();
 			this.wt.interrupt();
 
 			Platform.exit();
 			System.exit(0);
 		});
 
-		// javi serveru da je opcija 0
-		writer.println("0");
+		// say hello
+		writer.println("{type:gameMode}");
 		
 	}
+
 	// =========================================================
 	private void getWt() {
-		//this.rt = new ClientReadThread(this.name, clientSocket, this);
+		// this.rt = new ClientReadThread(this.name, clientSocket, this);
 		this.wt = new ClientWriteThread(this.name, this.clientSocket, this.inputField);
-		//rt.start();
+		// rt.start();
 		wt.start();
 
 	}
 
 	private void sendRequest(String selectedItem) {
-		writer.println(selectedItem);
+		writer.println("{type:request; opponent:" + selectedItem + "}");
 
 	}
-
 
 	private void sendMessage() {
 		String message = inputField.getText();
@@ -319,17 +323,13 @@ public class ClientGUI extends Application {
 		handleOption2();
 	}
 
-    public void showNotification(String message) {
+	public void showNotification(String message) {
 		Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Notification");
-        alert.setHeaderText("This is a notification");
-        alert.setContentText(message);
+		alert.setTitle("Notification");
+		alert.setHeaderText("This is a notification");
+		alert.setContentText(message);
 
-        alert.showAndWait();
-    }
-
-	
-
-	
+		alert.showAndWait();
+	}
 
 }

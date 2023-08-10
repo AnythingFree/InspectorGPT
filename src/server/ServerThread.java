@@ -38,7 +38,7 @@ final class ServerThread extends Thread {
         String message;
         try {
             while (!Thread.currentThread().isInterrupted()) {
-                message = reader.readLine();
+                message = this.reader.readLine();
                 handleIncomingMessage(message);
             }
         } catch (IOException e) {
@@ -85,7 +85,7 @@ final class ServerThread extends Thread {
                     this.name = resultMap.get("name").toString();
                     break;
 
-                case "users":
+                case "usernames":
 
                     data = resultMap.get("data").toString();
                     switch (data) {
@@ -116,22 +116,25 @@ final class ServerThread extends Thread {
                     break;
 
                 case "response":
-                    String respond = resultMap.get("answ").toString();
+                    String respond = resultMap.get("answer").toString();
                     String opponentUsername = resultMap.get("opponent").toString();
 
                     if (respond.equals("yes")) {
                         acceptRequest();
                         this.server.triggerAcceptRequest_prepareChannel(opponentUsername, this);
+                    } else if (respond.equals("no")){
+                        this.server.triggerRejectRequest(opponentUsername);
                     } else {
-                        this.server.rejectRequest(opponentUsername);
+                        throw new Exception("Unknown response type: " + respond);
                     }
                     break;
 
-                case "subsribe":
+                case "subscribe":
                     // subscribe to channel
                     Channel channel = this.server.getChannelByName(resultMap.get("channelName").toString());
                     channel.subscribe(this);
                     this.currentChannel = channel;
+                    writeHello();
                     break;
 
                 case "unsubscribe":
@@ -146,7 +149,7 @@ final class ServerThread extends Thread {
                     this.currentChannel.publish(this, mesage);
                     break;
 
-                case "chatMode":
+                case "gameMode":
                     writeHello();
                     break;
 
@@ -180,8 +183,8 @@ final class ServerThread extends Thread {
     }
 
     private void writeHello() {
-        writer.println("{type:chat; data:Hello, " + this.name + "! You are in " + this.currentChannel.getName()
-                + "! Type 'exit' to leave.}");
+        this.writer.println("{type:chat; data:Hello, " + this.name + "! You are in \"" + this.currentChannel.getName()
+                + "\"!}");
     }
 
     public void receiveMessage(String message) {

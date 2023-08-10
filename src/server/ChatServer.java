@@ -158,7 +158,7 @@ final class ChatServer {
 
     }
 
-    public void rejectRequest(String opponentUsername) {
+    public void triggerRejectRequest(String opponentUsername) {
         Optional<ServerThread> foundUser;
 
         synchronized (this.users) {

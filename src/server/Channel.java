@@ -9,6 +9,7 @@ public class Channel {
     private final String name;
     private final List<ServerThread> subscribers;
     private final ServerThread player1, player2;
+
     private Gpt playerGPT;
     private ArrayList<String> messageHistory;
     private boolean isGameFinished = false;
@@ -34,7 +35,7 @@ public class Channel {
         player2.receiveMessage("You are playing with " + player1.getUsername());
 
         this.playerGPT = new Gpt();
-        this.messageHistory = new ArrayList<String>();
+        this.messageHistory = new ArrayList<>();
     }
 
     public String getName() {
@@ -57,20 +58,20 @@ public class Channel {
                 .filter(u -> u != sender)
                 .forEach(u -> u.receiveMessage(message));
 
-        this.messageHistory.add(message);
-
-        if (this.playerGPT != null)
+        if (this.playerGPT != null) {
+            this.messageHistory.add(message);
             getResponseGPT(sender);
+        }
 
         // test
-        if (message.contains("hihi"))
-            gameOver(sender);
-        //System.out.println(this.isGameFinished);
-        //==========
+        // if (message.contains("hihi"))
+        // gameOver(sender);
+        // System.out.println(this.isGameFinished);
+        // ==========
 
     }
 
-    private void getResponseGPT(ServerThread sender) {
+    private synchronized void getResponseGPT(ServerThread sender) {
 
         String response = "[GPT]: " + this.playerGPT.getResponse(this.messageHistory);
         this.subscribers.stream()
@@ -84,7 +85,7 @@ public class Channel {
 
     }
 
-    private void gameOver(ServerThread sender) {
+    private synchronized void gameOver(ServerThread sender) {
 
         // send message to all players
         this.subscribers.stream()
@@ -105,22 +106,22 @@ public class Channel {
         // moras da odblokiras korisnika2 jer se ceka na input
         if (this.player1 == sender)
             this.player2.blokiraj();
-        else 
+        else
             this.player1.blokiraj();
-        
-        //================================
+
+        // ================================
 
     }
 
-    public boolean isHerePlayer(String username) {
+    public synchronized boolean isHerePlayer(String username) {
         return this.player1.getUsername().equals(username) || this.player2.getUsername().equals(username);
     }
 
-    public List<ServerThread> getSubscribers() {
+    public synchronized List<ServerThread> getSubscribers() {
         return subscribers;
     }
 
-    public synchronized  boolean isGameFinished() {
+    public synchronized boolean isGameFinished() {
         return this.isGameFinished;
     }
 

@@ -35,6 +35,7 @@ final class ClientWriteThread extends Thread {
 	@Override
 	public void run() {
 		String text;
+		String message;
 		while (!Thread.currentThread().isInterrupted()) {
 
 			synchronized (lock) {
@@ -42,12 +43,10 @@ final class ClientWriteThread extends Thread {
 				try {
 					lock.wait();
 
-					// Get text from the GUI input field
+					// Get text from the GUI input field and send it to the server
 					text = inputField.getText();
-
-					if (!text.isEmpty())
-						// sent to server
-						this.toServer.println("["+ this.username +"]: "+ text);
+					message = "[" + this.username + "]: " + text;
+					toServer.println("{type:publish; message:" + message + "}");
 
 				} catch (InterruptedException e) {
 					System.out.println("WriteThread was interrupted while in waiting state.");
