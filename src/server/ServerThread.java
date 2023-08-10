@@ -7,10 +7,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
-
 final class ServerThread extends Thread {
     private BufferedReader reader;
     private PrintWriter writer;
@@ -19,7 +15,7 @@ final class ServerThread extends Thread {
 
     private String name;
     private Channel currentChannel;
-    private Boolean request;
+    private int score = 0;
 
     public ServerThread(Socket client, ChatServer chatServer) {
         this.client = client;
@@ -59,7 +55,6 @@ final class ServerThread extends Thread {
                         // get connected users and send it
                         usernames = this.server.getUsersFromChannel("general");
                         writer.println("{type:chat; data:Connected users: " + usernames);
-                        
 
                         // msm da je isti kao 0
                         writeHello();
@@ -79,8 +74,9 @@ final class ServerThread extends Thread {
                     case ("2"):
                         // get connected users that are not playing a game and send it!!!!!!!!!!!!1
                         // treba promjeniti u KOJI NE IGRAJU IGRU
-                        usernames = this.server.getUserNames();
-                        usernames.remove(this.name);
+                        // ZA SAD NEK BUDE KOJI NEMAJU nista za CURRENTchannel
+                        usernames = this.server.getFreeUsers_Usernames(this);
+
                         writer.println(getJsonFormating(usernames));
 
                         // get opponent
@@ -114,7 +110,11 @@ final class ServerThread extends Thread {
                             if (mess != null)
                                 currentChannel.publish(this, mess);
 
-                        } while (!mess.equals("exit"));
+                            System.out.println(this.currentChannel.isGameFinished());
+
+                        } while (!mess.equals("exit") && !this.currentChannel.isGameFinished());
+
+                        signalGameFinished();
 
                         // unsubscribe from channel
                         this.currentChannel.unsubscribe(this);
@@ -143,6 +143,12 @@ final class ServerThread extends Thread {
             }
 
         }
+    }
+
+    private void signalGameFinished() {
+        this.writer.println("{type:system; data:inputFiled}");
+        this.writer.println(
+                "{type:system; data:notification; message:Game finished! Your current score: " + this.score + "}");
     }
 
     private String getJsonFormating(List<String> usernames) {
@@ -176,6 +182,20 @@ final class ServerThread extends Thread {
 
     public String getUsername() {
         return this.name;
+    }
+
+    public boolean isFree() {
+        if (this.currentChannel == null)
+            return true;
+        return false;
+    }
+
+    public synchronized int getScore() {
+        return score;
+    }
+
+    public synchronized void setScore(int score) {
+        this.score = score;
     }
 
 }

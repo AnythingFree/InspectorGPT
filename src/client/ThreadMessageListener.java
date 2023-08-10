@@ -11,20 +11,24 @@ import java.util.Map;
 import javafx.application.Platform;
 
 public class ThreadMessageListener extends Thread {
-    private _ClientSocket clientSocket;
     private ClientGUI clientGUI;
+    private BufferedReader reader;
+    private String message;
 
     public ThreadMessageListener(_ClientSocket clientSocket, ClientGUI clientGUI) {
-        this.clientSocket = clientSocket;
         this.clientGUI = clientGUI;
+        try {
+            this.reader = new BufferedReader(
+                    new InputStreamReader(clientSocket.getSocket().getInputStream()));
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void run() {
         try {
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(clientSocket.getSocket().getInputStream()));
-            String message;
             while (!Thread.currentThread().isInterrupted()) {
                 // Process the incoming message (update UI, handle requests, etc.)
                 message = reader.readLine();
@@ -47,11 +51,26 @@ public class ThreadMessageListener extends Thread {
 
             // Handle the message based on its type using a switch-case statement
             switch (messageType) {
+                case "system":
+                    String data = resultMap.get("data").toString();
+
+                    switch (data) {
+                        case "inputFiled":
+                            Platform.runLater(() -> {
+                                clientGUI.disableInputField();
+                            });
+                            break;
+
+                        case "notification":
+                            Platform.runLater(() -> {
+                                clientGUI.showNotification(resultMap.get("message").toString());
+                            });
+                            break;
+                    }
+                    break;
+                // usernames treba isto biti system message
                 case "usernames":
-                    // get connected users
-                    //Platform.runLater(() -> {
-                        clientGUI.setUserList(_getUserList(resultMap.get("data").toString()));
-                    //});
+                    clientGUI.setUserList(_getUserList(resultMap.get("data").toString()));
                     break;
 
                 case "request":
@@ -65,27 +84,21 @@ public class ThreadMessageListener extends Thread {
                 case "response":
                     // openChatRoom();
                     String res = resultMap.get("data").toString();
-                    if (res.equals("no")){
+                    if (res.equals("no")) {
                         Platform.runLater(() -> {
                             clientGUI.option2();
                         });
-                    }else{
-                         Platform.runLater(() -> {
+                    } else {
+                        Platform.runLater(() -> {
                             clientGUI.playGame();
                         });
                     }
                     break;
 
-                case "notification":
-                    // Handle notification message
-                    // handleNotificationMessage(jsonMessage);
-                    break;
-
                 case "chat":
                     // Handle chat message
-                    String data = resultMap.get("data").toString();
                     Platform.runLater(() -> {
-                        clientGUI.appendToChatArea(data);
+                        clientGUI.appendToChatArea(resultMap.get("data").toString());
                     });
                     break;
 
@@ -98,21 +111,21 @@ public class ThreadMessageListener extends Thread {
         } catch (Exception e) {
             System.out.println("Error in handleIncomingMessage");
             System.out.println(e.getMessage());
-            
+
         }
     }
 
     private List<String> _getUserList(String usernames) {
-		List<String> userList = new ArrayList<>();
-		if (!usernames.equals("[null]")) {
+        List<String> userList = new ArrayList<>();
+        if (!usernames.equals("[null]")) {
 
-			// Remove brackets
-			usernames = usernames.substring(1, usernames.length() - 1);
+            // Remove brackets
+            usernames = usernames.substring(1, usernames.length() - 1);
 
-			// Split by ", " to get a list of usernames
-			userList = new ArrayList<>(Arrays.asList(usernames.split(", ")));
+            // Split by ", " to get a list of usernames
+            userList = new ArrayList<>(Arrays.asList(usernames.split(", ")));
 
-		} 
-		return userList;
-	}
+        }
+        return userList;
+    }
 }

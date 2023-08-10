@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ChatGPTAPIExample",
+            "request": "launch",
+            "mainClass": "GPT.TEST.ChatGPTAPIExample",
+            "projectName": "VS-InspectorGPT_b40fc9cf"
+        },
+        {
+            "type": "java",
+            "name": "Test",
+            "request": "launch",
+            "mainClass": "GPT.Test",
+            "projectName": "VS-InspectorGPT_b40fc9cf"
+        },
+        {
+            "type": "java",
             "name": "_JsonUtil",
             "request": "launch",
             "mainClass": "client._JsonUtil",

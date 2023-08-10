@@ -28,13 +28,13 @@ public class ClientGUI extends Application {
 
 	//private Thread rt;
 	private Thread wt;
-
-	private _ClientSocket clientSocket;
-
-	private PrintWriter writer;
-	private List<String> userList;
 	private ThreadMessageListener messageListenerThread;
 
+	private _ClientSocket clientSocket;
+	private PrintWriter writer;
+
+	private List<String> userList;
+	
 	private Stage primaryStage;
 
 	public static void main(String[] args) {
@@ -307,19 +307,25 @@ public class ClientGUI extends Application {
 		this.chatArea.appendText(string + "\n");
 	}
 
+	public void disableInputField() {
+		this.inputField.setDisable(true);
+	}
+
 	public void option2() {
-		// Display a waiting message
-		// Create an information pop-up dialog
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Information");
-        alert.setHeaderText("This is an information message");
-        alert.setContentText("He said no...");
-
-        // Show the dialog and wait for user interaction
-        alert.showAndWait();
-
+		showNotification("He said no...");
 		handleOption2();
 	}
+
+    public void showNotification(String message) {
+		Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Notification");
+        alert.setHeaderText("This is a notification");
+        alert.setContentText(message);
+
+        alert.showAndWait();
+    }
+
+	
 
 	
 

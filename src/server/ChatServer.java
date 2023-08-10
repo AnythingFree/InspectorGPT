@@ -1,12 +1,8 @@
 package server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -36,6 +32,13 @@ final class ChatServer {
     }
 
     void execute() {
+
+        // Create the ChannelCleanupThread
+        long cleanupIntervalMillis = 60000; // Adjust the interval as needed
+        ThreadChannelCleanUp cleanupThread = new ThreadChannelCleanUp(allChannels, cleanupIntervalMillis);
+        cleanupThread.start();
+
+        // accept clients
         try (ServerSocket server = new ServerSocket(port)) {
             System.err.println("Chat server is listening on port: " + port);
 
@@ -56,60 +59,17 @@ final class ChatServer {
         } catch (IOException ex) {
             System.err.println("Server errored: " + ex.getMessage());
             ex.printStackTrace();
+        } finally {
+            // Stop the ChannelCleanupThread
+            cleanupThread.interrupt();
+            try {
+                cleanupThread.join();
+            } catch (InterruptedException e) {
+                // Handle the InterruptedException
+            }
         }
     }
 
-    /*
-     * void broadcast(UserThread sender, String message) {
-     * synchronized (this.users) {
-     * this.users.stream()
-     * .filter(u -> u != sender)
-     * .forEach(u -> u.sendMessage(message));
-     * }
-     * }
-     * 
-     * public boolean sendRequestTo(String usernameOpponent, String username) {
-     * Optional<UserThread> foundUser;
-     * synchronized (this.users) {
-     * foundUser = this.users.stream()
-     * .filter(u -> u.getNickname().equals(usernameOpponent))
-     * .findFirst();
-     * }
-     * 
-     * String message = "Do you want to play a game with " + username +
-     * "? (yes/no)";
-     * 
-     * boolean response = false;
-     * if (foundUser.isPresent()) {
-     * 
-     * // foundUser.get().interrupt();
-     * response = foundUser.get().receveRequest(message, username);
-     * }
-     * 
-     * return response;
-     * 
-     * }
-     * 
-     * 
-     * 
-     * public UserThread getUserByName(String usernameOpponent) {
-     * synchronized (this.users) {
-     * return this.users.stream()
-     * .filter(u -> u.getNickname().equals(usernameOpponent))
-     * .findFirst()
-     * .orElse(null);
-     * }
-     * }
-     * 
-     * 
-     * void broadcast(ServerThread sender, String message) {
-     * synchronized (this.users) {
-     * this.users.stream()
-     * .filter(u -> u != sender)
-     * .forEach(u -> u.receiveMessage(message));
-     * }
-     * }
-     */
     List<String> getUserNames() {
         synchronized (this.users) {
             return this.users.stream()
@@ -123,6 +83,19 @@ final class ChatServer {
         String username = user.getUsername();
         this.users.remove(user);
         System.err.println("Client disconnected: " + username);
+    }
+
+    public List<String> getFreeUsers_Usernames(ServerThread caller) {
+
+        synchronized (this.users) {
+            return this.users.stream()
+                    .filter(u -> u.isFree())
+                    .filter(u -> u != caller)
+                    .map(ServerThread::getUsername)
+                    .filter(nullName -> nullName != null)
+                    .collect(Collectors.toList());
+        }
+
     }
 
     // ====channel======
@@ -139,6 +112,21 @@ final class ChatServer {
 
     public void removeChannel(Channel channel) {
         this.allChannels.remove(channel);
+    }
+
+    public List<String> getUsersFromChannel(String channelName) {
+        Channel channel = this.getChannelByName(channelName);
+        List<ServerThread> sub;
+        if (channel != null) {
+            sub = channel.getSubscribers();
+            if (sub != null) {
+                return sub.stream()
+                        .map(ServerThread::getUsername)
+                        .filter(nullName -> nullName != null)
+                        .collect(Collectors.toList());
+            }
+        }
+        return null;
     }
 
     // ===gpt====
@@ -180,7 +168,6 @@ final class ChatServer {
 
     public void acceptRequest(String opponentUsername, ServerThread user2) {
         Optional<ServerThread> user1;
-       
 
         synchronized (this.users) {
             user1 = this.users.stream()
@@ -188,30 +175,15 @@ final class ChatServer {
                     .findFirst();
         }
 
-        
         if (user1.isPresent()) {
             user1.get().acceptRequest();
         }
 
         String name = user2.getUsername();
 
-        Channel channel = new Channel(name+opponentUsername, user1.get(), user2);
+        Channel channel = new Channel(name + opponentUsername, user1.get(), user2);
         this.allChannels.add(channel);
     }
-
-    public List<String> getUsersFromChannel(String channelName) {
-        Channel channel = this.getChannelByName(channelName);
-        List<ServerThread> sub;
-        if (channel != null) {
-            sub = channel.getSubscribers();
-            if (sub != null) {
-                return sub.stream()
-                        .map(ServerThread::getUsername)
-                        .filter(nullName -> nullName != null)
-                        .collect(Collectors.toList());
-            }
-        }   
-        return null;
-    }
+    // ======================================
 
 }

@@ -17,9 +17,13 @@ prompt = " ".join(sys.argv[1:])
 
 # Generate text using the GPT-3 model
 response = openai.Completion.create(
-    engine="text-davinci-003",  # Use the GPT-3 engine
+    model="text-davinci-003",  # Use the GPT-3 engine
     prompt=prompt,
-    max_tokens=50  # Set the maximum number of tokens in the generated output
+    max_tokens=100#,
+    #temperature=1,
+    #top_p=1,
+    #frequency_penalty=0,
+    #presence_penalty=0
 )
 
 # Print the generated text
