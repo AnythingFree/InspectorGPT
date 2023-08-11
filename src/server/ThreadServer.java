@@ -163,7 +163,7 @@ final class ThreadServer extends Thread {
 
                 case "scene":
                     String scene = resultMap.get("scene").toString();
-                    writer.println("{type:scene; data:" + scene + "}");
+                    writer.println("{type:scene; scene:" + scene + "}");
                     break;
                     
                 case "option3":

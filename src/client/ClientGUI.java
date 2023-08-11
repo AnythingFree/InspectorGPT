@@ -29,7 +29,7 @@ public class ClientGUI extends Application {
 
 	private Stage primaryStage;
 
-	SceneBuilder sceneBuilder;
+	private SceneBuilder sceneBuilder;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -53,8 +53,10 @@ public class ClientGUI extends Application {
 
 			// ask for usernames
 			writer.println("{type:usernames; data:all}");
-			// login window
-			writer.println("{type:scene; scene:login}");
+
+			// Create and initiate TextInputDialog for username input
+			_UsernameInputDialog usernameInputDialog = new _UsernameInputDialog();
+			this.name = usernameInputDialog.getUsername(getUserList());
 
 			// Send username to server
 			writer.println("{type:setName; name:" + this.name + "}");
@@ -225,7 +227,7 @@ public class ClientGUI extends Application {
 		this.userList = _getUserList;
 	}
 
-	synchronized List<String> getUserList() {
+	private synchronized List<String> getUserList() {
 		return this.userList;
 	}
 
@@ -247,11 +249,8 @@ public class ClientGUI extends Application {
 		alert.setTitle("Notification: " + this.name);
 		alert.setHeaderText("This is a notification");
 		alert.setContentText(message);
-		alert.showAndWait();
-	}
 
-	void getUsernameLogin() {
-		this.name = this.sceneBuilder.getUsernameLogin(getUserList());
+		alert.showAndWait();
 	}
 
 }
