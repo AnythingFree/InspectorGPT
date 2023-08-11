@@ -194,10 +194,9 @@ final class ThreadServer extends Thread {
     private void writeRulesToTheGame() {
         this.writer.println("{type:chat; data:Rules: }");
         this.writer.println("{type:chat; data:1. The secret key is an English word. No numbers or simbols.}");
-        this.writer.println("{type:chat; data:Rules:2. You have to make the GPT say it, not you.}");
+        this.writer.println("{type:chat; data:2. You have to make the GPT say it, not you.}");
         this.writer.println(
-                "{type:chat; data:Rules:3. There are no rules! This is a school project full of bugs and anything can happen!}");
-
+                "{type:chat; data:3. There are no rules! This is a school project full of bugs and anything can happen!}");
     }
 
     public void receiveMessage(String message) {
