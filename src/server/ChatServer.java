@@ -20,7 +20,7 @@ final class ChatServer {
     }
 
     private final int port;
-    private final Set<ServerThread> users;
+    private final Set<ThreadServer> users;
     private List<Channel> allChannels = new ArrayList<>();
 
     ChatServer(int port) {
@@ -46,7 +46,7 @@ final class ChatServer {
                 System.err.println("Client connected.");
 
                 // We dispatch a new thread for each user in the chat
-                ServerThread user = new ServerThread(client, this);
+                ThreadServer user = new ThreadServer(client, this);
                 this.users.add(user);
                 user.start();
 
@@ -68,24 +68,24 @@ final class ChatServer {
     List<String> getUserNames() {
         synchronized (this.users) {
             return this.users.stream()
-                    .map(ServerThread::getUsername)
+                    .map(ThreadServer::getUsername)
                     .filter(nullName -> nullName != null)
                     .collect(Collectors.toList());
         }
     }
 
-    void remove(ServerThread user) {
+    void remove(ThreadServer user) {
         String username = user.getUsername();
         this.users.remove(user);
         System.err.println("Client disconnected: " + username);
     }
 
-    public List<String> getFreeUsers_Usernames(ServerThread caller) {
+    public List<String> getFreeUsers_Usernames(ThreadServer caller) {
         synchronized (this.users) {
             return this.users.stream()
                     .filter(u -> u.isFree())
                     .filter(u -> u != caller)
-                    .map(ServerThread::getUsername)
+                    .map(ThreadServer::getUsername)
                     .filter(nullName -> nullName != null)
                     .collect(Collectors.toList());
         }
@@ -110,12 +110,12 @@ final class ChatServer {
 
     public List<String> getUsersFromChannel(String channelName) {
         Channel channel = this.getChannelByName(channelName);
-        List<ServerThread> sub;
+        List<ThreadServer> sub;
         if (channel != null) {
             sub = channel.getSubscribers();
             if (sub != null) {
                 return sub.stream()
-                        .map(ServerThread::getUsername)
+                        .map(ThreadServer::getUsername)
                         .filter(nullName -> nullName != null)
                         .collect(Collectors.toList());
             }
@@ -123,7 +123,7 @@ final class ChatServer {
         return null;
     }
 
-    private void prepareChannel(String opponentUsername, ServerThread user2, ServerThread user1) {
+    private void prepareChannel(String opponentUsername, ThreadServer user2, ThreadServer user1) {
         String name = user2.getUsername();
 
         Channel channel = new Channel(name + " VS " + opponentUsername, user1, user2);
@@ -132,7 +132,7 @@ final class ChatServer {
 
     // ==PLAY GAME====
     public void sendRequestTo(String usernameOpponent, String username) {
-        Optional<ServerThread> foundUser;
+        Optional<ThreadServer> foundUser;
 
         synchronized (this.users) {
             foundUser = this.users.stream()
@@ -148,7 +148,7 @@ final class ChatServer {
     }
 
     public void triggerRejectRequest(String opponentUsername) {
-        Optional<ServerThread> foundUser;
+        Optional<ThreadServer> foundUser;
 
         synchronized (this.users) {
             foundUser = this.users.stream()
@@ -162,8 +162,8 @@ final class ChatServer {
         }
     }
 
-    public void triggerAcceptRequest_prepareChannel(String opponentUsername, ServerThread user2) {
-        Optional<ServerThread> user1;
+    public void triggerAcceptRequest_prepareChannel(String opponentUsername, ThreadServer user2) {
+        Optional<ThreadServer> user1;
 
         synchronized (this.users) {
             user1 = this.users.stream()

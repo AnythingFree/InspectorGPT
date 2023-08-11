@@ -284,7 +284,7 @@ public class ClientGUI extends Application {
 	// =========================================================
 	private void getWt() {
 		// this.rt = new ClientReadThread(this.name, clientSocket, this);
-		this.wt = new ClientWriteThread(this.name, this.clientSocket, this.inputField);
+		this.wt = new ThreadClientWrite(this.name, this.clientSocket, this.inputField);
 		// rt.start();
 		wt.start();
 
@@ -328,7 +328,7 @@ public class ClientGUI extends Application {
 
 			// send to server by invoking or notifying writeThread
 			if (this.wt.isAlive())
-				((ClientWriteThread) this.wt).notifyThread();
+				((ThreadClientWrite) this.wt).notifyThread();
 			else
 				System.out.println("wt nije ziv");
 

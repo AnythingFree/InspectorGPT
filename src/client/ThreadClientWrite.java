@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 
 import javafx.scene.control.TextField;
 
-final class ClientWriteThread extends Thread {
+final class ThreadClientWrite extends Thread {
 	private final String username;
 	private PrintWriter toServer;
 
@@ -13,7 +13,7 @@ final class ClientWriteThread extends Thread {
 
 	private final Object lock = new Object();
 
-	ClientWriteThread(String username, _ClientSocket clientSocket, TextField inputField) {
+	ThreadClientWrite(String username, _ClientSocket clientSocket, TextField inputField) {
 		this.username = username;
 		this.inputField = inputField;
 

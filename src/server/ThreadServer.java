@@ -10,7 +10,7 @@ import java.util.Map;
 
 import client._JsonUtil;
 
-final class ServerThread extends Thread {
+final class ThreadServer extends Thread {
     private BufferedReader reader;
     private PrintWriter writer;
     private ChatServer server;
@@ -20,7 +20,7 @@ final class ServerThread extends Thread {
     private Channel currentChannel;
     private int score = 0;
 
-    public ServerThread(Socket client, ChatServer chatServer) {
+    public ThreadServer(Socket client, ChatServer chatServer) {
         this.server = chatServer;
         this.client = client;
         try {

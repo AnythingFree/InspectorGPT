@@ -7,8 +7,8 @@ import GPT.Gpt;
 
 public class Channel {
     private final String name;
-    private final List<ServerThread> subscribers;
-    private final ServerThread player1, player2;
+    private final List<ThreadServer> subscribers;
+    private final ThreadServer player1, player2;
 
     private Gpt playerGPT;
     private ArrayList<String> messageHistory;
@@ -22,7 +22,7 @@ public class Channel {
         this.playerGPT = null;
     }
 
-    public Channel(String name, ServerThread player1, ServerThread player2) {
+    public Channel(String name, ThreadServer player1, ThreadServer player2) {
         this.name = name;
         this.subscribers = new ArrayList<>();
         this.player1 = player1;
@@ -42,19 +42,19 @@ public class Channel {
         return name;
     }
 
-    public synchronized void subscribe(ServerThread userThread) {
+    public synchronized void subscribe(ThreadServer userThread) {
         publish(userThread, userThread.getUsername() + " has joined the chat.");
         subscribers.add(userThread);
     }
 
-    public synchronized void unsubscribe(ServerThread userThread) {
+    public synchronized void unsubscribe(ThreadServer userThread) {
         publish(userThread, userThread.getUsername() + " has left the chat.");
         checkIfsurrender(userThread);
         subscribers.remove(userThread);
 
     }
 
-    public synchronized void publish(ServerThread sender, String message) {
+    public synchronized void publish(ThreadServer sender, String message) {
         if (!this.isGameFinished) {
 
             this.subscribers.stream()
@@ -76,7 +76,7 @@ public class Channel {
 
     }
 
-    private synchronized void getResponseGPT(ServerThread sender) {
+    private synchronized void getResponseGPT(ThreadServer sender) {
 
         String response = "[GPT]: " + this.playerGPT.getResponse(this.messageHistory);
         this.subscribers.stream()
@@ -90,7 +90,7 @@ public class Channel {
 
     }
 
-    private synchronized void gameOver(ServerThread sender) {
+    private synchronized void gameOver(ThreadServer sender) {
 
         // send message to all players
         this.subscribers.stream()
@@ -116,7 +116,7 @@ public class Channel {
         return this.player1.getUsername().equals(username) || this.player2.getUsername().equals(username);
     }
 
-    public synchronized List<ServerThread> getSubscribers() {
+    public synchronized List<ThreadServer> getSubscribers() {
         return subscribers;
     }
 
@@ -132,7 +132,7 @@ public class Channel {
         return this.name != "general" && this.subscribers.size() == 0;
     }
 
-    private void checkIfsurrender(ServerThread userThread) {
+    private void checkIfsurrender(ThreadServer userThread) {
         if (this.isGameFinished || this.name.equals("general"))
             return;
 
@@ -143,7 +143,7 @@ public class Channel {
 
     }
 
-    public void surrender(ServerThread serverThread, ServerThread winner) {
+    public void surrender(ThreadServer serverThread, ThreadServer winner) {
         // send message to all players that the player has surrendered
         this.subscribers.stream()
                 .forEach(u -> u.receiveMessage(serverThread.getUsername() + " has surrendered!"));
