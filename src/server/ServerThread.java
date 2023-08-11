@@ -37,7 +37,7 @@ final class ServerThread extends Thread {
 
         String message;
         try {
-            while (!Thread.currentThread().isInterrupted()) {
+            while (!Thread.currentThread().isInterrupted() && !this.client.isClosed()) {
                 message = this.reader.readLine();
                 handleIncomingMessage(message);
             }
@@ -122,7 +122,7 @@ final class ServerThread extends Thread {
                     if (respond.equals("yes")) {
                         acceptRequest();
                         this.server.triggerAcceptRequest_prepareChannel(opponentUsername, this);
-                    } else if (respond.equals("no")){
+                    } else if (respond.equals("no")) {
                         this.server.triggerRejectRequest(opponentUsername);
                     } else {
                         throw new Exception("Unknown response type: " + respond);
@@ -131,10 +131,13 @@ final class ServerThread extends Thread {
 
                 case "subscribe":
                     // subscribe to channel
-                    Channel channel = this.server.getChannelByName(resultMap.get("channelName").toString());
+                    String channelName = resultMap.get("channelName").toString();
+                    Channel channel = this.server.getChannelByName(channelName);
                     channel.subscribe(this);
                     this.currentChannel = channel;
                     writeHello();
+
+                    writer.println("{type:chat; data: Connected users: " + this.server.getUsersFromChannel(channelName) + "}");
                     break;
 
                 case "unsubscribe":
@@ -151,10 +154,7 @@ final class ServerThread extends Thread {
 
                 case "gameMode":
                     writeHello();
-                    break;
-
-                case "gameFinished":
-                    signalGameFinished();
+                    writeRulesToTheGame();
                     break;
 
                 case "option3":
@@ -172,7 +172,7 @@ final class ServerThread extends Thread {
 
     }
 
-    private void signalGameFinished() {
+    void signalGameFinished() {
         this.writer.println("{type:system; data:inputFiled}");
         this.writer.println(
                 "{type:system; data:notification; message:Game finished! Your current score: " + this.score + "}");
@@ -185,6 +185,15 @@ final class ServerThread extends Thread {
     private void writeHello() {
         this.writer.println("{type:chat; data:Hello, " + this.name + "! You are in \"" + this.currentChannel.getName()
                 + "\"!}");
+    }
+
+    private void writeRulesToTheGame() {
+        this.writer.println("{type:chat; data:Rules: }");
+        this.writer.println("{type:chat; data:1. The secret key is an English word. No numbers or simbols.}");
+        this.writer.println("{type:chat; data:Rules:2. You have to make the GPT say it, not you.}");
+        this.writer.println(
+                "{type:chat; data:Rules:3. There are no rules! This is a school project full of bugs and anything can happen!}");
+
     }
 
     public void receiveMessage(String message) {

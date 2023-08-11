@@ -53,21 +53,24 @@ public class Channel {
     }
 
     public synchronized void publish(ServerThread sender, String message) {
+        if (!this.isGameFinished) {
 
-        this.subscribers.stream()
-                .filter(u -> u != sender)
-                .forEach(u -> u.receiveMessage(message));
+            this.subscribers.stream()
+                    .filter(u -> u != sender)
+                    .forEach(u -> u.receiveMessage(message));
 
-        if (this.playerGPT != null) {
-            this.messageHistory.add(message);
-            getResponseGPT(sender);
+            if (this.playerGPT != null) {
+                this.messageHistory.add(message);
+                getResponseGPT(sender);
+            }
+
+            // test
+            if (message.contains("hihi"))
+                gameOver(sender);
+            System.out.println(this.isGameFinished);
+            // ==========
+
         }
-
-        // test
-        // if (message.contains("hihi"))
-        // gameOver(sender);
-        // System.out.println(this.isGameFinished);
-        // ==========
 
     }
 
@@ -102,15 +105,9 @@ public class Channel {
                 .forEach(u -> u.receiveMessage("GPT has been removed."));
         this.playerGPT = null;
 
-        // NEBLOKIRAJUCI IO TREBA ILI BOLJA ORGANIZACIJA SERVER TREDA
-        // moras da odblokiras korisnika2 jer se ceka na input
-        if (this.player1 == sender)
-            this.player2.blokiraj();
-        else
-            this.player1.blokiraj();
-
-        // ================================
-
+        // signal GUIs to finish game
+        this.player1.signalGameFinished();
+        this.player2.signalGameFinished();
     }
 
     public synchronized boolean isHerePlayer(String username) {

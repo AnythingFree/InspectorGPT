@@ -70,6 +70,7 @@ public class ThreadMessageListener extends Thread {
                     break;
                 // usernames treba isto biti system message
                 case "usernames":
+                    System.out.println(resultMap.get("data"));     
                     clientGUI.setUserList(_getUserList(resultMap.get("data").toString()));
                     break;
 

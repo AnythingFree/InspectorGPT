@@ -18,7 +18,7 @@ public class _ClientSocket {
 
     	System.err.println("Zatvara se soket...");
         try {
-			socket.close();
+			this.socket.close();
 		} catch (IOException e) {
 			System.out.println("Greska pri zatvaranju client soketa.");
 		}

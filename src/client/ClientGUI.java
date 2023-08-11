@@ -33,7 +33,7 @@ public class ClientGUI extends Application {
 	private _ClientSocket clientSocket;
 	private PrintWriter writer;
 
-	private List<String> userList;
+	private volatile List<String> userList;
 
 	private Stage primaryStage;
 
@@ -78,7 +78,7 @@ public class ClientGUI extends Application {
 
 	// ============================================================================
 	private void setMainWindow() throws IOException {
-		primaryStage.setTitle("Chat Client");
+		primaryStage.setTitle("Chat Client: "+ this.name);
 		BorderPane layout = new BorderPane();
 
 		// Create an HBox for the buttons
@@ -113,7 +113,7 @@ public class ClientGUI extends Application {
 		// Code to handle Option 1
 		System.out.println("Option 1 clicked");
 
-		primaryStage.setTitle("Option 1"); // Set the window title for Option 1
+		primaryStage.setTitle("Option 1: "+ this.name); // Set the window title for Option 1
 		BorderPane layout = new BorderPane();
 
 		this.chatArea = new TextArea();
@@ -149,7 +149,7 @@ public class ClientGUI extends Application {
 		// ask for usernames in channel
 		writer.println("{type:usernames; data:inChannel; channelName:general}");
 		// print usernames
-		appendToChatArea("Connected users: " + userList.toString());
+		// appendToChatArea("Connected users: " + this.userList);
 	}
 
 	private void handleOption2() {
@@ -208,7 +208,7 @@ public class ClientGUI extends Application {
 	public void showGameRequestDialog(String usernameOpponent) {
 		// Create and configure the dialog
 		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("Game Request");
+		alert.setTitle("Game Request: "+ this.name);
 		alert.setHeaderText("Incoming Game Request");
 		alert.setContentText("You have an incoming game request from " + usernameOpponent + ". Do you want to accept?");
 
@@ -237,7 +237,7 @@ public class ClientGUI extends Application {
 		// Code to handle Option 1
 		System.out.println("Playing game");
 
-		primaryStage.setTitle("Its on"); // Set the window title for Option 1
+		primaryStage.setTitle("Its on: "+ this.name); // Set the window title for Option 1
 		BorderPane layout = new BorderPane();
 
 		this.chatArea = new TextArea();
@@ -325,7 +325,7 @@ public class ClientGUI extends Application {
 
 	public void showNotification(String message) {
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Notification");
+		alert.setTitle("Notification: "+ this.name);
 		alert.setHeaderText("This is a notification");
 		alert.setContentText(message);
 
