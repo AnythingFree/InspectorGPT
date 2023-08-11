@@ -49,7 +49,9 @@ public class Channel {
 
     public synchronized void unsubscribe(ServerThread userThread) {
         publish(userThread, userThread.getUsername() + " has left the chat.");
+        checkIfsurrender(userThread);
         subscribers.remove(userThread);
+
     }
 
     public synchronized void publish(ServerThread sender, String message) {
@@ -128,5 +130,23 @@ public class Channel {
 
     public boolean readyForCleanup() {
         return this.name != "general" && this.subscribers.size() == 0;
+    }
+
+    private void checkIfsurrender(ServerThread userThread) {
+        if (this.isGameFinished)
+            return;
+            
+        if (this.player1.equals(userThread))
+            surrender(userThread, this.player2);
+        else if (this.player2.equals(userThread))
+            surrender(userThread, this.player1);
+    }
+
+    public void surrender(ServerThread serverThread, ServerThread winner) {
+        // send message to all players that the player has surrendered
+        this.subscribers.stream()
+                .forEach(u -> u.receiveMessage(serverThread.getUsername() + " has surrendered!"));
+
+        gameOver(winner);
     }
 }

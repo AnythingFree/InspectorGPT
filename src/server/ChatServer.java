@@ -52,9 +52,6 @@ final class ChatServer {
                 this.users.add(user);
                 user.start();
 
-                // Also, we cannot use try-with-resources block on client socket
-                // because it would be closed immediately after dispatching a
-                // thread. We leave the thread to close the socket.
             }
         } catch (IOException ex) {
             System.err.println("Server errored: " + ex.getMessage());
@@ -86,7 +83,6 @@ final class ChatServer {
     }
 
     public List<String> getFreeUsers_Usernames(ServerThread caller) {
-
         synchronized (this.users) {
             return this.users.stream()
                     .filter(u -> u.isFree())
@@ -134,11 +130,6 @@ final class ChatServer {
 
         Channel channel = new Channel(name + " VS " + opponentUsername, user1, user2);
         this.allChannels.add(channel);
-    }
-
-    // ===gpt====
-    public String askGPT(String message) {
-        return JavaRunCommand.ask(message);
     }
 
     // ==PLAY GAME====

@@ -35,7 +35,7 @@ public class ThreadMessageListener extends Thread {
                 handleIncomingMessage(message);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error reading message from server: " + e.getMessage());
         } finally {
             System.out.println("Message listener thread stopped");
         }

@@ -24,7 +24,7 @@ final class ServerThread extends Thread {
         this.server = chatServer;
         this.client = client;
         try {
-            this.reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            this.reader = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
             this.writer = new PrintWriter(client.getOutputStream(), true);
         } catch (IOException e) {
             System.out.println("Error getting input/output streams in serverThread : " + e.getMessage());
@@ -36,9 +36,12 @@ final class ServerThread extends Thread {
     public void run() {
 
         String message;
+       
         try {
             while (!Thread.currentThread().isInterrupted() && !this.client.isClosed()) {
                 message = this.reader.readLine();
+                if (message.equals("close"))
+                    break;
                 handleIncomingMessage(message);
             }
         } catch (IOException e) {
@@ -142,7 +145,8 @@ final class ServerThread extends Thread {
 
                 case "unsubscribe":
                     // unsubscribe from channel
-                    this.currentChannel.unsubscribe(this);
+                    if (this.currentChannel != null)
+                        this.currentChannel.unsubscribe(this);
                     this.currentChannel = null;
                     break;
 
@@ -156,7 +160,7 @@ final class ServerThread extends Thread {
                     writeHello();
                     writeRulesToTheGame();
                     break;
-
+                    
                 case "option3":
                     break;
 

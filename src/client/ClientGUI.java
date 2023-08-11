@@ -77,8 +77,8 @@ public class ClientGUI extends Application {
 	}
 
 	// ============================================================================
-	private void setMainWindow() throws IOException {
-		primaryStage.setTitle("Chat Client: "+ this.name);
+	private void setMainWindow() {
+		primaryStage.setTitle("Chat Client: " + this.name);
 		BorderPane layout = new BorderPane();
 
 		// Create an HBox for the buttons
@@ -101,11 +101,7 @@ public class ClientGUI extends Application {
 		Scene scene = new Scene(layout, 400, 300);
 		primaryStage.setScene(scene);
 		primaryStage.setOnCloseRequest(e -> {
-
-			this.clientSocket.close();
-
-			Platform.exit();
-			System.exit(0);
+			closeApp();
 		});
 	}
 
@@ -113,18 +109,29 @@ public class ClientGUI extends Application {
 		// Code to handle Option 1
 		System.out.println("Option 1 clicked");
 
-		primaryStage.setTitle("Option 1: "+ this.name); // Set the window title for Option 1
+		primaryStage.setTitle("Option 1: " + this.name); // Set the window title for Option 1
 		BorderPane layout = new BorderPane();
 
+		// create the chatArea
 		this.chatArea = new TextArea();
 		this.chatArea.setEditable(false);
+		// put it in the center
 		layout.setCenter(this.chatArea);
 
+		// create inputField, sendButton
 		this.inputField = new TextField();
 		Button sendButton = new Button("Send");
 		sendButton.setOnAction(e -> sendMessage());
 		HBox inputBox = new HBox(this.inputField, sendButton);
-		layout.setBottom(inputBox);
+		// backButton
+		Button backButton = new Button("Back");
+		backButton.setOnAction(e -> goBackToMainWindow());
+		// Create a VBox to hold both the back button and the input box
+		HBox bottomContainer = new HBox(inputBox, backButton);
+		bottomContainer.setSpacing(10); // Set spacing between components
+
+		// put them on bottom
+		layout.setBottom(bottomContainer);
 
 		Scene scene = new Scene(layout, 400, 300);
 		primaryStage.setScene(scene);
@@ -135,13 +142,7 @@ public class ClientGUI extends Application {
 
 		// Set the close request handler
 		primaryStage.setOnCloseRequest(e -> {
-			this.clientSocket.close();
-
-			// this.rt.interrupt();
-			this.wt.interrupt();
-
-			Platform.exit();
-			System.exit(0);
+			closeApp();
 		});
 
 		// subscribe to general channel
@@ -183,18 +184,22 @@ public class ClientGUI extends Application {
 		});
 
 		userListLayout.setCenter(userListView);
-		userListLayout.setBottom(sendRequestButton);
+		// backButton
+		Button backButton = new Button("Back");
+		backButton.setOnAction(e -> goBackToMainWindow());
+		// Create a VBox to hold both the back button and the input box
+		HBox bottomContainer = new HBox(sendRequestButton, backButton);
+		bottomContainer.setSpacing(10); // Set spacing between components
+
+		// put them on bottom
+		userListLayout.setBottom(bottomContainer);
 
 		Scene scene = new Scene(userListLayout, 300, 200);
-
 		primaryStage.setScene(scene);
 
 		// Set the close request handler
 		primaryStage.setOnCloseRequest(e -> {
-			this.clientSocket.close();
-
-			Platform.exit();
-			System.exit(0);
+			closeApp();
 		});
 	}
 
@@ -208,7 +213,7 @@ public class ClientGUI extends Application {
 	public void showGameRequestDialog(String usernameOpponent) {
 		// Create and configure the dialog
 		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("Game Request: "+ this.name);
+		alert.setTitle("Game Request: " + this.name);
 		alert.setHeaderText("Incoming Game Request");
 		alert.setContentText("You have an incoming game request from " + usernameOpponent + ". Do you want to accept?");
 
@@ -228,7 +233,7 @@ public class ClientGUI extends Application {
 			// User declined the game request
 			System.out.println("Odbijam");
 			writer.println("{type:response; answer:no; opponent:" + usernameOpponent + "}");
-		
+
 		}
 	}
 
@@ -237,7 +242,7 @@ public class ClientGUI extends Application {
 		// Code to handle Option 1
 		System.out.println("Playing game");
 
-		primaryStage.setTitle("Its on: "+ this.name); // Set the window title for Option 1
+		primaryStage.setTitle("Its on: " + this.name); // Set the window title for Option 1
 		BorderPane layout = new BorderPane();
 
 		this.chatArea = new TextArea();
@@ -248,7 +253,15 @@ public class ClientGUI extends Application {
 		Button sendButton = new Button("Send");
 		sendButton.setOnAction(e -> sendMessage());
 		HBox inputBox = new HBox(this.inputField, sendButton);
-		layout.setBottom(inputBox);
+		// backButton
+		Button backButton = new Button("Back");
+		backButton.setOnAction(e -> goBackToMainWindow()); // MOZDA NEKA POTVRDA
+		// Create a VBox to hold both the back button and the input box
+		HBox bottomContainer = new HBox(inputBox, backButton);
+		bottomContainer.setSpacing(10); // Set spacing between components
+
+		// put them on bottom
+		layout.setBottom(bottomContainer);
 
 		Scene scene = new Scene(layout, 400, 300);
 		primaryStage.setScene(scene);
@@ -260,18 +273,12 @@ public class ClientGUI extends Application {
 
 		// Set the close request handler
 		primaryStage.setOnCloseRequest(e -> {
-			this.clientSocket.close();
-
-			// this.rt.interrupt();
-			this.wt.interrupt();
-
-			Platform.exit();
-			System.exit(0);
+			closeApp();
 		});
 
 		// say hello
 		writer.println("{type:gameMode}");
-		
+
 	}
 
 	// =========================================================
@@ -281,6 +288,33 @@ public class ClientGUI extends Application {
 		// rt.start();
 		wt.start();
 
+	}
+
+	private void closeWT() {
+		if (this.wt != null && this.wt.isAlive()) {
+			this.wt.interrupt();
+			try {
+				wt.join();
+			} catch (InterruptedException e1) {
+				System.out.println("Error u zatvaranju wt: " + e1.getMessage());
+			}
+
+		}
+	}
+
+	private void closeApp() {
+		this.writer.println("close");
+		this.clientSocket.close();
+		closeWT();
+		this.writer.close();
+		Platform.exit();
+		System.exit(0);
+	}
+
+	private void goBackToMainWindow() {
+		writer.println("{type:unsubscribe}");
+		closeWT();
+		setMainWindow();
 	}
 
 	private void sendRequest(String selectedItem) {
@@ -325,7 +359,7 @@ public class ClientGUI extends Application {
 
 	public void showNotification(String message) {
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Notification: "+ this.name);
+		alert.setTitle("Notification: " + this.name);
 		alert.setHeaderText("This is a notification");
 		alert.setContentText(message);
 
