@@ -69,7 +69,7 @@ public class Channel {
             // test
             if (message.contains("hihi"))
                 gameOver(sender);
-            System.out.println(this.isGameFinished);
+            //System.out.println(this.isGameFinished);
             // ==========
 
         }
@@ -133,13 +133,14 @@ public class Channel {
     }
 
     private void checkIfsurrender(ServerThread userThread) {
-        if (this.isGameFinished)
+        if (this.isGameFinished || this.name.equals("general"))
             return;
-            
+
         if (this.player1.equals(userThread))
             surrender(userThread, this.player2);
         else if (this.player2.equals(userThread))
             surrender(userThread, this.player1);
+
     }
 
     public void surrender(ServerThread serverThread, ServerThread winner) {

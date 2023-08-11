@@ -11,8 +11,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import GPT.JavaRunCommand;
-
 final class ChatServer {
     static final int SERVER_TEST_PORT = 5000;
 
@@ -158,7 +156,7 @@ final class ChatServer {
                     .findFirst();
         }
 
-        System.out.println(foundUser.get().getUsername());
+        //System.out.println(foundUser.get().getUsername());
         if (foundUser.isPresent()) {
             foundUser.get().rejectRequest();
         }
