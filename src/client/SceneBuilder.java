@@ -14,12 +14,13 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
 public class SceneBuilder {
 
     private ClientGUI clientGUI;
 
-    public SceneBuilder(ClientGUI clientGUI) {
+    public SceneBuilder(ClientGUI clientGUI, Stage primaryStage) {
         this.clientGUI = clientGUI;
     }
 
@@ -47,19 +48,19 @@ public class SceneBuilder {
         return scene;
     }
 
-    public Scene getChatScene(TextArea chatArea, TextField inputField) {
+    public Scene getChatScene() {
         BorderPane layout = new BorderPane();
 
         // create the chatArea
-        chatArea = new TextArea();
-        chatArea.setEditable(false);
-        layout.setCenter(chatArea);
+        this.clientGUI.chatArea = new TextArea();
+        this.clientGUI.chatArea.setEditable(false);
+        layout.setCenter(this.clientGUI.chatArea);
 
         // create inputField, sendButton
-        inputField = new TextField();
+        this.clientGUI.inputField = new TextField();
         Button sendButton = new Button("Send");
         sendButton.setOnAction(e -> this.clientGUI.sendMessage());
-        HBox inputBox = new HBox(inputField, sendButton);
+        HBox inputBox = new HBox(this.clientGUI.inputField, sendButton);
         // backButton
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> this.clientGUI.goBackToMainWindow());
@@ -131,6 +132,11 @@ public class SceneBuilder {
             return true;
         else
             return false;
+    }
+
+    String getUsernameLogin(List<String> userList) {
+        _UsernameInputDialog usernameInputDialog = new _UsernameInputDialog();
+        return usernameInputDialog.getUsername(userList);
     }
 
 }

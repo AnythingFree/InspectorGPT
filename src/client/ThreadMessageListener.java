@@ -63,20 +63,20 @@ public class ThreadMessageListener extends Thread {
 
                         case "notification":
                             Platform.runLater(() -> {
-                                clientGUI.showNotification(resultMap.get("message").toString());
+                                clientGUI.showNotification(resultMap.get("message"));
                             });
                             break;
                     }
                     break;
                 // usernames treba isto biti system message
                 case "usernames":
-                    System.out.println(resultMap.get("data"));     
-                    clientGUI.setUserList(_getUserList(resultMap.get("data").toString()));
+                    System.out.println(resultMap.get("data"));
+                    clientGUI.setUserList(_getUserList(resultMap.get("data")));
                     break;
 
                 case "request":
                     // Handle request message
-                    String usernameOpponent = resultMap.get("opponent").toString();
+                    String usernameOpponent = resultMap.get("opponent");
                     Platform.runLater(() -> {
                         clientGUI.showGameRequestDialog(usernameOpponent);
                     });
@@ -99,8 +99,19 @@ public class ThreadMessageListener extends Thread {
                 case "chat":
                     // Handle chat message
                     Platform.runLater(() -> {
-                        clientGUI.appendToChatArea(resultMap.get("data").toString());
+                        clientGUI.appendToChatArea(resultMap.get("data"));
                     });
+                    break;
+
+                case "scene":
+                    // Handle scene message
+                    String scene = resultMap.get("scene").toString();
+                        
+                    if (scene.equals("option2"))
+                        Platform.runLater(() -> {
+                            clientGUI.getScene2();
+                        });
+
                     break;
 
                 // Add more cases for other message types as needed

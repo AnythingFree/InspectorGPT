@@ -3,28 +3,20 @@ package client;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Optional;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class ClientGUI extends Application {
 
 	private String name;
-	private TextArea chatArea;
-	private TextField inputField;
+	TextArea chatArea;
+	TextField inputField;
 
 	// private Thread rt;
 	private Thread wt;
@@ -33,11 +25,11 @@ public class ClientGUI extends Application {
 	private _ClientSocket clientSocket;
 	private PrintWriter writer;
 
-	private volatile List<String> userList;
+	private volatile List<String> userList = null;
 
 	private Stage primaryStage;
 
-	private SceneBuilder sceneBuilder;
+	SceneBuilder sceneBuilder;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -49,7 +41,7 @@ public class ClientGUI extends Application {
 		// connect to server
 		try {
 			this.primaryStage = primaryStage;
-			this.sceneBuilder = new SceneBuilder(this);
+			this.sceneBuilder = new SceneBuilder(this, primaryStage);
 
 			clientSocket = new _ClientSocket("localhost", 5000);
 			System.out.println("Connected to the chat server @ " + 5000);
@@ -61,10 +53,8 @@ public class ClientGUI extends Application {
 
 			// ask for usernames
 			writer.println("{type:usernames; data:all}");
-
-			// Create and initiate TextInputDialog for username input
-			_UsernameInputDialog usernameInputDialog = new _UsernameInputDialog();
-			this.name = usernameInputDialog.getUsername(userList);
+			// login window
+			writer.println("{type:scene; scene:login}");
 
 			// Send username to server
 			writer.println("{type:setName; name:" + this.name + "}");
@@ -95,7 +85,7 @@ public class ClientGUI extends Application {
 		System.out.println("Option 1 clicked");
 		primaryStage.setTitle("Option 1: " + this.name);
 
-		Scene scene = this.sceneBuilder.getChatScene(this.chatArea, this.inputField);
+		Scene scene = this.sceneBuilder.getChatScene();
 		primaryStage.setScene(scene);
 
 		getWt();
@@ -107,7 +97,7 @@ public class ClientGUI extends Application {
 		// subscribe to general channel
 		writer.println("{type:subscribe; channelName:general}");
 		// ask for usernames in channel
-		writer.println("{type:usernames; data:inChannel; channelName:general}");
+		// writer.println("{type:usernames; data:inChannel; channelName:general}");
 	}
 
 	void handleOption2() {
@@ -116,8 +106,12 @@ public class ClientGUI extends Application {
 
 		// get free users
 		writer.println("{type:usernames; data:free}");
+		// zbog kasnjenja
+		writer.println("{type:scene; scene:option2}");
+	}
 
-		Scene scene = this.sceneBuilder.getOption2Scene(this.userList);
+	void getScene2() {
+		Scene scene = this.sceneBuilder.getOption2Scene(getUserList());
 		primaryStage.setScene(scene);
 
 		// Set the close request handler
@@ -136,7 +130,7 @@ public class ClientGUI extends Application {
 		System.out.println("Playing game");
 		primaryStage.setTitle("Its on: " + this.name); // Set the window title for Option 1
 
-		Scene scene = this.sceneBuilder.getChatScene(this.chatArea, this.inputField);
+		Scene scene = this.sceneBuilder.getChatScene();
 		primaryStage.setScene(scene);
 
 		getWt();
@@ -227,8 +221,12 @@ public class ClientGUI extends Application {
 		}
 	}
 
-	void setUserList(List<String> _getUserList) {
+	synchronized void setUserList(List<String> _getUserList) {
 		this.userList = _getUserList;
+	}
+
+	synchronized List<String> getUserList() {
+		return this.userList;
 	}
 
 	void appendToChatArea(String string) {
@@ -249,8 +247,11 @@ public class ClientGUI extends Application {
 		alert.setTitle("Notification: " + this.name);
 		alert.setHeaderText("This is a notification");
 		alert.setContentText(message);
-
 		alert.showAndWait();
+	}
+
+	void getUsernameLogin() {
+		this.name = this.sceneBuilder.getUsernameLogin(getUserList());
 	}
 
 }

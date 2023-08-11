@@ -160,6 +160,11 @@ final class ThreadServer extends Thread {
                     writeHello();
                     writeRulesToTheGame();
                     break;
+
+                case "scene":
+                    String scene = resultMap.get("scene").toString();
+                    writer.println("{type:scene; data:" + scene + "}");
+                    break;
                     
                 case "option3":
                     break;
@@ -171,7 +176,6 @@ final class ThreadServer extends Thread {
         } catch (Exception e) {
             System.out.println("Error in handleIncomingMessage [server]");
             System.out.println(e.getMessage());
-
         }
 
     }
@@ -183,6 +187,8 @@ final class ThreadServer extends Thread {
     }
 
     private String getJsonFormating(List<String> usernames) {
+        if (usernames == null)
+            return "{type:usernames; data:[]}";
         return "{type:usernames; data:" + usernames.toString() + "}";
     }
 
