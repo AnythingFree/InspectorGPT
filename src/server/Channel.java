@@ -20,7 +20,8 @@ public class Channel {
         this.player1 = null;
         this.player2 = null;
         this.playerGPT = null;
-    }
+
+    } // nemam vremena da pravim poseban kanal za general chat
 
     public Channel(String name, ThreadServer player1, ThreadServer player2) {
         this.name = name;
@@ -34,7 +35,7 @@ public class Channel {
         player1.receiveMessage("You are playing with " + player2.getUsername());
         player2.receiveMessage("You are playing with " + player1.getUsername());
 
-        this.playerGPT = new Gpt();
+        // this.playerGPT = new Gpt();
         this.messageHistory = new ArrayList<>();
     }
 
@@ -61,6 +62,7 @@ public class Channel {
                     .filter(u -> u != sender)
                     .forEach(u -> u.receiveMessage(message));
 
+            // ako je igrica ako nije general chat
             if (this.playerGPT != null) {
                 this.messageHistory.add(message);
                 getResponseGPT(sender);
@@ -69,7 +71,7 @@ public class Channel {
             // test
             if (message.contains("hihi"))
                 gameOver(sender);
-            //System.out.println(this.isGameFinished);
+            // System.out.println(this.isGameFinished);
             // ==========
 
         }
@@ -90,7 +92,7 @@ public class Channel {
 
     }
 
-    private synchronized void gameOver(ThreadServer sender) {
+    synchronized void gameOver(ThreadServer sender) {
 
         // send message to all players
         this.subscribers.stream()

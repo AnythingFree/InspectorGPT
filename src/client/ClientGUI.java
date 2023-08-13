@@ -8,8 +8,12 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class ClientGUI extends Application {
@@ -17,18 +21,12 @@ public class ClientGUI extends Application {
 	private String name;
 	TextArea chatArea;
 	TextField inputField;
-
-	// private Thread rt;
 	private Thread wt;
 	private ThreadMessageListener messageListenerThread;
-
 	private _ClientSocket clientSocket;
 	private PrintWriter writer;
-
 	private volatile List<String> userList = null;
-
 	private Stage primaryStage;
-
 	private SceneBuilder sceneBuilder;
 
 	public static void main(String[] args) {
@@ -37,7 +35,6 @@ public class ClientGUI extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
-
 		// connect to server
 		try {
 			this.primaryStage = primaryStage;
@@ -81,70 +78,72 @@ public class ClientGUI extends Application {
 		});
 	}
 
-	// =======================SCENES============================================
+	// ==============FUNCTIONS (zovu se izsceneBuildera)=====
 	void handleOption1() {
-		// Code to handle Option 1
 		System.out.println("Option 1 clicked");
-		primaryStage.setTitle("Option 1: " + this.name);
-
-		Scene scene = this.sceneBuilder.getChatScene();
-		primaryStage.setScene(scene);
-
-		getWt();
-
-		primaryStage.setOnCloseRequest(e -> {
-			closeApp();
-		});
-
+		// ask to change scene to scene1
+		writer.println("{type:scene; scene:option1}");
 		// subscribe to general channel
 		writer.println("{type:subscribe; channelName:general}");
-		// ask for usernames in channel
-		// writer.println("{type:usernames; data:inChannel; channelName:general}");
 	}
 
 	void handleOption2() {
-		// Code to handle Option 2
 		System.out.println("Option 2 clicked");
-
 		// get free users
 		writer.println("{type:usernames; data:free}");
-		// zbog kasnjenja
+		// ask to change scene to scene2
 		writer.println("{type:scene; scene:option2}");
 	}
 
-	void getScene2() {
-		Scene scene = this.sceneBuilder.getOption2Scene(getUserList());
-		primaryStage.setScene(scene);
-
-		// Set the close request handler
-		primaryStage.setOnCloseRequest(e -> {
-			closeApp();
-		});
-	}
-
 	void handleOption3() {
-		// Code to handle Option 3
 		System.out.println("Option 3 clicked");
 	}
 
-	void playGame() {
-		// Code to handle Game
-		System.out.println("Playing game");
-		primaryStage.setTitle("Its on: " + this.name); // Set the window title for Option 1
-
+	// ===========SCENES (zovu se iz THREADMESSAGELISTENER)=================
+	void getScene1() {
+		primaryStage.setTitle("Option 1: " + this.name);
 		Scene scene = this.sceneBuilder.getChatScene();
 		primaryStage.setScene(scene);
-
 		getWt();
+		primaryStage.setOnCloseRequest(e -> {
+			closeApp();
+		});
+	}
 
-		// Set the close request handler
+	void getScene2() {
+		primaryStage.setTitle("Option 2: " + this.name);
+		Scene scene = this.sceneBuilder.getOption2Scene(getUserList());
+		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(e -> {
+			closeApp();
+		});
+	}
+
+	private void getGameScene() {
+		primaryStage.setTitle("Its on: " + this.name);
+		Scene scene = this.sceneBuilder.getChatScene();
+
+		BorderPane root = (BorderPane) scene.getRoot();
+		root.setTop(new HBox());
+
+		scene.setRoot(root);
+		primaryStage.setScene(scene);
+		getWt();
 		primaryStage.setOnCloseRequest(e -> {
 			closeApp();
 		});
 
-		// say hello
-		writer.println("{type:gameMode}");
+	}
 
+	void playGame() {
+		System.out.println("Playing game");
+
+		// playGame se zove iz threadMessageListenera
+		getGameScene();
+		// start clock
+
+		// say hello
+		writer.println("{type:scene; scene:gameMode}");
 	}
 
 	// =============================================================================
@@ -153,23 +152,19 @@ public class ClientGUI extends Application {
 		// Show the dialog and handle the user's response
 		boolean result = this.sceneBuilder.showGameRequestDialog(usernameOpponent, this.name);
 		if (result) {
-			// User accepted the game request
-			// System.out.println("Prihvatam");
 			writer.println("{type:response; answer:yes; opponent:" + usernameOpponent + "}");
 		} else {
-			// User declined the game request
-			// System.out.println("Odbijam");
 			writer.println("{type:response; answer:no; opponent:" + usernameOpponent + "}");
 
 		}
 	}
 
-	// ====================PRIVATE FUNC=====================================
+	// ===================POMOCNE FUNKCIJE================================
+	// ====================PRIVATE FUNC======================
 
 	private void getWt() {
 		this.wt = new ThreadClientWrite(this.name, this.clientSocket, this.inputField);
 		wt.start();
-
 	}
 
 	private void closeWT() {
@@ -180,7 +175,6 @@ public class ClientGUI extends Application {
 			} catch (InterruptedException e1) {
 				System.out.println("Error u zatvaranju wt: " + e1.getMessage());
 			}
-
 		}
 	}
 
@@ -239,7 +233,7 @@ public class ClientGUI extends Application {
 		this.inputField.setDisable(true);
 	}
 
-	void option2() {
+	void goBackToOption2() {
 		showNotification("He said no...");
 		handleOption2();
 	}

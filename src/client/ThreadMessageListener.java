@@ -87,7 +87,7 @@ public class ThreadMessageListener extends Thread {
                     String res = resultMap.get("data").toString();
                     if (res.equals("no")) {
                         Platform.runLater(() -> {
-                            clientGUI.option2();
+                            clientGUI.goBackToOption2();
                         });
                     } else {
                         Platform.runLater(() -> {
@@ -106,11 +106,16 @@ public class ThreadMessageListener extends Thread {
                 case "scene":
                     // Handle scene message
                     String scene = resultMap.get("scene").toString();
-                        
+
                     if (scene.equals("option2"))
                         Platform.runLater(() -> {
                             clientGUI.getScene2();
                         });
+                    else if (scene.equals("option1")) {
+                        Platform.runLater(() -> {
+                            clientGUI.getScene1();
+                        });
+                    }
 
                     break;
 

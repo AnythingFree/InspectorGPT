@@ -3,6 +3,7 @@ package client;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -60,6 +61,13 @@ public class SceneBuilder {
         this.clientGUI.inputField = new TextField();
         Button sendButton = new Button("Send");
         sendButton.setOnAction(e -> this.clientGUI.sendMessage());
+
+        // Set an event listener for the Enter key press event on the TextField
+        this.clientGUI.inputField.setOnAction(event -> {
+            sendButton.fire();
+        });
+
+        // pack it all up
         HBox inputBox = new HBox(this.clientGUI.inputField, sendButton);
         // backButton
         Button backButton = new Button("Back");
@@ -134,9 +142,18 @@ public class SceneBuilder {
             return false;
     }
 
-    String getUsernameLogin(List<String> userList) {
-        _UsernameInputDialog usernameInputDialog = new _UsernameInputDialog();
-        return usernameInputDialog.getUsername(userList);
+    public Scene getGameScene() {
+        Scene scene = getChatScene();
+        Label currentPlayerLabel = new Label("sdf");
+        Label player1TimeLabel = new Label();
+        Label player2TimeLabel = new Label();
+
+        BorderPane root = (BorderPane) scene.getRoot();
+        root.setTop(new HBox(currentPlayerLabel, player1TimeLabel, player2TimeLabel));
+
+        scene.setRoot(root);
+
+        return scene;
     }
 
 }

@@ -36,7 +36,7 @@ final class ThreadServer extends Thread {
     public void run() {
 
         String message;
-       
+
         try {
             while (!Thread.currentThread().isInterrupted() && !this.client.isClosed()) {
                 message = this.reader.readLine();
@@ -140,7 +140,8 @@ final class ThreadServer extends Thread {
                     this.currentChannel = channel;
                     writeHello();
 
-                    writer.println("{type:chat; data: Connected users: " + this.server.getUsersFromChannel(channelName) + "}");
+                    writer.println(
+                            "{type:chat; data: Connected users: " + this.server.getUsersFromChannel(channelName) + "}");
                     break;
 
                 case "unsubscribe":
@@ -156,16 +157,16 @@ final class ThreadServer extends Thread {
                     this.currentChannel.publish(this, mesage);
                     break;
 
-                case "gameMode":
-                    writeHello();
-                    writeRulesToTheGame();
-                    break;
-
                 case "scene":
                     String scene = resultMap.get("scene").toString();
+                    if (scene.equals("gameMode")) {
+                        writeHello();
+                        writeRulesToTheGame();
+                        break;
+                    }
                     writer.println("{type:scene; scene:" + scene + "}");
                     break;
-                    
+
                 case "option3":
                     break;
 
