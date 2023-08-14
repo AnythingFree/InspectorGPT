@@ -55,15 +55,38 @@ public class ThreadMessageListener extends Thread {
                     String data = resultMap.get("data").toString();
 
                     switch (data) {
-                        case "inputFiled":
+                        case "inputFiledOFF":
                             Platform.runLater(() -> {
                                 clientGUI.disableInputField();
                             });
                             break;
 
+                        case "inputFiledON":
+                            Platform.runLater(() -> {
+                                clientGUI.enableInputField();
+                            });
+                            break;
+
+                        case "TimerButton":
+                            String state = resultMap.get("state").toString();
+                            if (state.equals("ON"))
+                                Platform.runLater(() -> {
+                                    clientGUI.enableTimerButton();
+                                });
+                            else
+                                Platform.runLater(() -> {
+                                    clientGUI.disableTimerButton();
+                                });
+                            break;
+
                         case "notification":
                             Platform.runLater(() -> {
                                 clientGUI.showNotification(resultMap.get("message"));
+                            });
+                            break;
+                        case "TimeLabel":
+                            Platform.runLater(() -> {
+                                clientGUI.updateTimeLabels(resultMap.get("player1Time"), resultMap.get("player2Time"));
                             });
                             break;
                     }

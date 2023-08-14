@@ -37,6 +37,10 @@ public class Gpt {
         return response;
     }
 
+    public String getTheHint() {
+        return "za sad stedim na tokenima";
+    }
+
 
 
 }

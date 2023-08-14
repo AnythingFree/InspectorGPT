@@ -3,17 +3,16 @@ package client;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class ClientGUI extends Application {
@@ -28,6 +27,10 @@ public class ClientGUI extends Application {
 	private volatile List<String> userList = null;
 	private Stage primaryStage;
 	private SceneBuilder sceneBuilder;
+	volatile Label player1Time;
+	volatile Label player2Time;
+	private ChessClockClient clock;
+	Button timerButton;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -121,12 +124,8 @@ public class ClientGUI extends Application {
 
 	private void getGameScene() {
 		primaryStage.setTitle("Its on: " + this.name);
-		Scene scene = this.sceneBuilder.getChatScene();
+		Scene scene = this.sceneBuilder.getGameScene();
 
-		BorderPane root = (BorderPane) scene.getRoot();
-		root.setTop(new HBox());
-
-		scene.setRoot(root);
 		primaryStage.setScene(scene);
 		getWt();
 		primaryStage.setOnCloseRequest(e -> {
@@ -140,10 +139,18 @@ public class ClientGUI extends Application {
 
 		// playGame se zove iz threadMessageListenera
 		getGameScene();
+
 		// start clock
+		startClock();
 
 		// say hello
 		writer.println("{type:scene; scene:gameMode}");
+	}
+
+	private void startClock() {
+		// start thread for labels
+		clock = new ChessClockClient(this);
+		clock.startUpdateThread();
 	}
 
 	// =============================================================================
@@ -233,6 +240,10 @@ public class ClientGUI extends Application {
 		this.inputField.setDisable(true);
 	}
 
+	void enableInputField() {
+		this.inputField.setDisable(false);
+	}
+
 	void goBackToOption2() {
 		showNotification("He said no...");
 		handleOption2();
@@ -246,5 +257,25 @@ public class ClientGUI extends Application {
 
 		alert.showAndWait();
 	}
+
+	synchronized void updateTimeLabels(String time1, String time2) {
+		this.player1Time.setText("Player1: " + time1);
+		this.player2Time.setText("Player2: " + time2);
+
+		this.clock.updateTime(time1, time2);
+		this.clock.updateTurn();
+	}
+
+	void switchPlayer() {
+		writer.println("{type:gameOptions; option:switchPlayer}");
+	}
+
+	public void disableTimerButton() {
+		this.timerButton.setDisable(true);
+	}
+
+    public void enableTimerButton() {
+		this.timerButton.setDisable(false);
+    }
 
 }

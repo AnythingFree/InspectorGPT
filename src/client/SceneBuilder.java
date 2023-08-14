@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -144,15 +145,19 @@ public class SceneBuilder {
 
     public Scene getGameScene() {
         Scene scene = getChatScene();
-        Label currentPlayerLabel = new Label("sdf");
-        Label player1TimeLabel = new Label();
-        Label player2TimeLabel = new Label();
 
         BorderPane root = (BorderPane) scene.getRoot();
-        root.setTop(new HBox(currentPlayerLabel, player1TimeLabel, player2TimeLabel));
+        this.clientGUI.timerButton = new Button("Timer");
+
+        this.clientGUI.timerButton.setOnAction(e -> {
+            this.clientGUI.switchPlayer();
+        });
+
+        this.clientGUI.player1Time = new Label("player1: 30");
+        this.clientGUI.player2Time = new Label("player2: 30");
+        root.setTop(new HBox(this.clientGUI.timerButton, this.clientGUI.player1Time, this.clientGUI.player2Time));
 
         scene.setRoot(root);
-
         return scene;
     }
 

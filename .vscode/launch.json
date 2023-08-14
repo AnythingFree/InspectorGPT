@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ChessClock",
+            "request": "launch",
+            "mainClass": "server.ChessClock",
+            "projectName": "VS-InspectorGPT_b40fc9cf"
+        },
+        {
+            "type": "java",
             "name": "ChatGPTAPIExample",
             "request": "launch",
             "mainClass": "GPT.TEST.ChatGPTAPIExample",

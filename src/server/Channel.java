@@ -1,10 +1,21 @@
 package server;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import GPT.Gpt;
 
+/**
+ * Channel class is used to represent a channel in the server. It contains
+ * information about the channel name, subscribers, players, game, message
+ * history and chess clock.
+ * 
+ * 
+ * @TODO: razdvojiti u dva kanala/sobe, jedan za general chat, drugi za igru,
+ *        treba
+ *        rijesiti posmatrace
+ */
 public class Channel {
     private final String name;
     private final List<ThreadServer> subscribers;
@@ -13,6 +24,7 @@ public class Channel {
     private Gpt playerGPT;
     private ArrayList<String> messageHistory;
     private boolean isGameFinished = false;
+    private ChessClock chessClock;
 
     public Channel(String name) {
         this.name = name;
@@ -20,7 +32,7 @@ public class Channel {
         this.player1 = null;
         this.player2 = null;
         this.playerGPT = null;
-
+        this.chessClock = null;
     } // nemam vremena da pravim poseban kanal za general chat
 
     public Channel(String name, ThreadServer player1, ThreadServer player2) {
@@ -35,12 +47,15 @@ public class Channel {
         player1.receiveMessage("You are playing with " + player2.getUsername());
         player2.receiveMessage("You are playing with " + player1.getUsername());
 
+        this.chessClock = new ChessClock(30, this, player1, player2); // 30 seconds
         // this.playerGPT = new Gpt();
         this.messageHistory = new ArrayList<>();
     }
 
-    public String getName() {
-        return name;
+    // start
+    public void start() {
+        initialMessage();
+        this.chessClock.start();
     }
 
     public synchronized void subscribe(ThreadServer userThread) {
@@ -110,28 +125,8 @@ public class Channel {
         this.playerGPT = null;
 
         // signal GUIs to finish game
-        this.player1.signalGameFinished();
-        this.player2.signalGameFinished();
-    }
-
-    public synchronized boolean isHerePlayer(String username) {
-        return this.player1.getUsername().equals(username) || this.player2.getUsername().equals(username);
-    }
-
-    public synchronized List<ThreadServer> getSubscribers() {
-        return subscribers;
-    }
-
-    public synchronized boolean isGameFinished() {
-        return this.isGameFinished;
-    }
-
-    private synchronized void setGameFinished() {
-        this.isGameFinished = true;
-    }
-
-    public boolean readyForCleanup() {
-        return this.name != "general" && this.subscribers.size() == 0;
+        this.player1.signalGameFinished(sender);
+        this.player2.signalGameFinished(sender);
     }
 
     private void checkIfsurrender(ThreadServer userThread) {
@@ -151,5 +146,78 @@ public class Channel {
                 .forEach(u -> u.receiveMessage(serverThread.getUsername() + " has surrendered!"));
 
         gameOver(winner);
+    }
+
+    private void initialMessage() {
+        this.subscribers.stream()
+                .forEach(u -> u.receiveMessage("Game has started!"));
+        this.subscribers.stream()
+                .forEach(u -> u.receiveMessage("GPT has been added."));
+        this.subscribers.stream()
+                .forEach(u -> u.receiveMessage("You have 30 seconds to win the game!"));
+        // this.subscribers.stream()
+        // .forEach(u -> u.receiveMessage("GPTs hint is: " +
+        // this.playerGPT.getTheHint()));
+    }
+
+    public synchronized List<ThreadServer> getSubscribers() {
+        return subscribers;
+    }
+
+    public synchronized boolean isGameFinished() {
+        return this.isGameFinished;
+    }
+
+    private synchronized void setGameFinished() {
+        this.isGameFinished = true;
+    }
+
+    public boolean readyForCleanup() {
+        return this.name != "general" && this.subscribers.size() == 0;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void switchTurn() {
+        this.chessClock.switchTurn();
+        // this.player1.updateTimeLeft();
+        // this.player2.updateTimeLeft();
+    }
+
+    // ne treba a zao brisati
+    public synchronized boolean isHerePlayer(String username) {
+        return this.player1.getUsername().equals(username) || this.player2.getUsername().equals(username);
+    }
+
+    public ThreadServer getOpponent(ThreadServer threadServer) {
+        if (this.player1.equals(threadServer))
+            return this.player2;
+        else if (this.player2.equals(threadServer))
+            return this.player1;
+        else
+            return null;
+    }
+
+    public void pauseClock() {
+        this.chessClock.stop();
+    }
+
+    public void resumeClock() {
+        this.chessClock.start();
+    }
+
+    public int getPlayer1Time() {
+        return this.chessClock.getPlayer1Time();
+
+    }
+
+    public int getPlayer2Time() {
+        return this.chessClock.getPlayer2Time();
+    }
+
+    public Thread getClockThread() {
+        return this.chessClock.getThread();
     }
 }

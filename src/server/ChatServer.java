@@ -128,6 +128,8 @@ final class ChatServer {
 
         Channel channel = new Channel(name + " VS " + opponentUsername, user1, user2);
         this.allChannels.add(channel);
+
+        channel.start();
     }
 
     // ==PLAY GAME====
@@ -156,7 +158,7 @@ final class ChatServer {
                     .findFirst();
         }
 
-        //System.out.println(foundUser.get().getUsername());
+        // System.out.println(foundUser.get().getUsername());
         if (foundUser.isPresent()) {
             foundUser.get().rejectRequest();
         }

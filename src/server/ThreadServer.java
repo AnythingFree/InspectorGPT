@@ -124,6 +124,8 @@ final class ThreadServer extends Thread {
 
                     if (respond.equals("yes")) {
                         acceptRequest();
+                        disableInputField();
+                        disableTimerButton();
                         this.server.triggerAcceptRequest_prepareChannel(opponentUsername, this);
                     } else if (respond.equals("no")) {
                         this.server.triggerRejectRequest(opponentUsername);
@@ -167,6 +169,39 @@ final class ThreadServer extends Thread {
                     writer.println("{type:scene; scene:" + scene + "}");
                     break;
 
+                case "gameOptions":
+                    String option = resultMap.get("option").toString();
+                    switch (option) {
+                        case "switchPlayer":
+                            this.currentChannel.pauseClock();
+                            try {
+                                this.currentChannel.getClockThread().join(); // Sleep for 5 seconds
+                            } catch (InterruptedException e) {
+                                System.out.println("Nesto se desilo dok se sat zaustavljau u threadserveru");
+                                ;
+                            }
+                            disableInputField();
+                            disableTimerButton();
+
+                            ThreadServer opponThreadServer = this.currentChannel.getOpponent(this);
+
+                            String player1Time = Integer.toString(this.currentChannel.getPlayer1Time());
+                            String player2Time = Integer.toString(this.currentChannel.getPlayer2Time());
+
+                            opponThreadServer.updateTimeLabel(player1Time, player2Time);
+                            updateTimeLabel(player1Time, player2Time);
+
+                            opponThreadServer.enebleInputField();
+                            opponThreadServer.enableTimerButton();
+
+                            this.currentChannel.switchTurn();
+                            this.currentChannel.resumeClock();
+                            break;
+
+                        default:
+                            System.out.println("Unknown option: " + option);
+                    }
+
                 case "option3":
                     break;
 
@@ -181,10 +216,33 @@ final class ThreadServer extends Thread {
 
     }
 
-    void signalGameFinished() {
-        this.writer.println("{type:system; data:inputFiled}");
+    private void updateTimeLabel(String player1Time, String player2Time) {
+        this.writer.println("{type:system; data:TimeLabel; player1Time:" + player1Time
+                + "; player2Time:" + player2Time + "}");
+        System.out.println("player1: " + player1Time + " player2: " + player2Time);
+    }
+
+    void signalGameFinished(ThreadServer winner) {
+        disableInputField();
         this.writer.println(
-                "{type:system; data:notification; message:Game finished! Your current score: " + this.score + "}");
+                "{type:system; data:notification; message:Game finished!" +
+                        winner.name + "has won! Your current total score: " + this.score + "}");
+    }
+
+    private void disableInputField() {
+        this.writer.println("{type:system; data:inputFiledOFF}");
+    }
+
+    private void enebleInputField() {
+        this.writer.println("{type:system; data:inputFiledON}");
+    }
+
+    private void disableTimerButton() {
+        this.writer.println("{type:system; data:TimerButton; state:OFF}");
+    }
+
+    private void enableTimerButton() {
+        this.writer.println("{type:system; data:TimerButton; state:ON}");
     }
 
     private String getJsonFormating(List<String> usernames) {
@@ -245,7 +303,7 @@ final class ThreadServer extends Thread {
     }
 
     public void blokiraj() {
-        this.writer.println("{type:system; data:inputFiled}");
+        disableInputField();
     }
 
 }
