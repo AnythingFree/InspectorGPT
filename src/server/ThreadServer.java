@@ -163,8 +163,8 @@ final class ThreadServer extends Thread {
                 case "scene":
                     String scene = resultMap.get("scene").toString();
                     if (scene.equals("gameMode")) {
-                        writeHello();
-                        writeRulesToTheGame();
+                        //writeHello();
+                        // writeRulesToTheGame();
                         break;
                     }
                     writer.println("{type:scene; scene:" + scene + "}");
@@ -244,6 +244,10 @@ final class ThreadServer extends Thread {
                         winner.name + "has won! Your current total score: " + this.score + "}");
     }
 
+    void sendNotification(String message) {
+        this.writer.println("{type:system; data:notification; message:" + message + "}");
+    }
+
     private void disableInputField() {
         this.writer.println("{type:system; data:inputFiledOFF}");
     }
@@ -280,6 +284,7 @@ final class ThreadServer extends Thread {
     }
 
     public void receiveMessage(String message) {
+        System.out.println(this.name);
         writer.println("{type:chat; data:" + message + "}");
     }
 

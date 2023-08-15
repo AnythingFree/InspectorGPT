@@ -236,6 +236,7 @@ public class ClientGUI extends Application {
 	}
 
 	void appendToChatArea(String string) {
+		string = string.replace("\\n", "\n");
 		this.chatArea.appendText(string + "\n");
 	}
 
@@ -256,6 +257,8 @@ public class ClientGUI extends Application {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Notification: " + this.name);
 		alert.setHeaderText("This is a notification");
+
+		message = message.replace("\\n", "\n");
 		alert.setContentText(message);
 
 		alert.showAndWait();

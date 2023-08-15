@@ -46,8 +46,8 @@ public class Channel {
         player1.receiveMessage("You are playing with " + player2.getUsername());
         player2.receiveMessage("You are playing with " + player1.getUsername());
 
-        this.chessClock = new ChessClock(60*10, this, player1, player2); // 30 seconds
-        this.playerGPT = new Gpt();
+        this.chessClock = new ChessClock(60 * 10, this, player1, player2); // 30 seconds
+        // this.playerGPT = new Gpt();
         this.messageHistory = new ArrayList<>();
     }
 
@@ -148,15 +148,22 @@ public class Channel {
     }
 
     private void initialMessage() {
+        String rules = "Rules: \\n" +
+                "1. The secret key is an English word. No numbers or simbols. \\n" +
+                "2. You have to make the GPT say it, not you. \\n" +
+                "3. There are no rules! This is a school project full of bugs and anything can happen! \\n";
+
+        String welcome = "Welcome to the \"" + this.name + "\" channel! \\n" +
+                "Game has started! \\n" +
+                "You have 10 min to win the game! \\n" ;
+                //"GPTs hint is: " + this.playerGPT.getTheHint() + "\\n";
+
+        // send notifications to users
         this.subscribers.stream()
-                .forEach(u -> u.receiveMessage("Game has started!"));
+                .forEach(u -> u.receiveMessage(rules));
+
         this.subscribers.stream()
-                .forEach(u -> u.receiveMessage("GPT has been added."));
-        this.subscribers.stream()
-                .forEach(u -> u.receiveMessage("You have 30 seconds to win the game!"));
-        this.subscribers.stream()
-                .forEach(u -> u.receiveMessage("GPTs hint is: " +
-                        this.playerGPT.getTheHint()));
+                .forEach(u -> u.receiveMessage(welcome));
     }
 
     public synchronized List<ThreadServer> getSubscribers() {
