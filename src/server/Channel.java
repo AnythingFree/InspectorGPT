@@ -46,7 +46,7 @@ public class Channel {
         player1.receiveMessage("You are playing with " + player2.getUsername());
         player2.receiveMessage("You are playing with " + player1.getUsername());
 
-        this.chessClock = new ChessClock(120, this, player1, player2); // 30 seconds
+        this.chessClock = new ChessClock(60*10, this, player1, player2); // 30 seconds
         this.playerGPT = new Gpt();
         this.messageHistory = new ArrayList<>();
     }

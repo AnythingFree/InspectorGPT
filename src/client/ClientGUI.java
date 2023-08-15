@@ -152,7 +152,7 @@ public class ClientGUI extends Application {
 
 	private void startClock() {
 		// start thread for labels
-		clock = new ChessClockClient(this, 120); // koliko vremena bi trebao da dobije sa servera
+		clock = new ChessClockClient(this, 60*10); // koliko vremena bi trebao da dobije sa servera
 		clock.startUpdateThread();
 	}
 
