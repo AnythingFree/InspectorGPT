@@ -79,9 +79,29 @@ public class ClientGUI extends Application {
 		primaryStage.setTitle("Chat Client: " + this.name);
 		Scene scene = this.sceneBuilder.getMainScene();
 		primaryStage.setScene(scene);
+
+		getUpdateTableThread(scene);
+
 		primaryStage.setOnCloseRequest(e -> {
 			closeApp();
 		});
+
+	}
+
+	private void getUpdateTableThread(Scene scene) {
+		Thread updateTableThread = new Thread(() -> {
+			while (primaryStage.getScene() == scene) {
+				try {
+					Thread.sleep(1000);
+					refreshTableCommand();
+
+				} catch (InterruptedException e) {
+					System.out.println("updateTableThread interrupted");
+				}
+			}
+			System.out.println("updateTableThread stopped");
+		});
+		updateTableThread.start();
 	}
 
 	// ==============FUNCTIONS (zovu se izsceneBuildera)=====
@@ -315,7 +335,6 @@ public class ClientGUI extends Application {
 		ArrayList<LeaderboardEntry> entries = new ArrayList<LeaderboardEntry>();
 		// iterate through dataTable {usernames:scores}, add username and socres to
 		// entries
-		System.out.println(dataTable);
 		dataTable = dataTable.replaceAll("\\[", "");
 		dataTable = dataTable.replaceAll("\\]", "");
 

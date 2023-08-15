@@ -42,11 +42,8 @@ public class SceneBuilder {
         Button option3Button = new Button("Option 3");
         option3Button.setOnAction(e -> this.clientGUI.handleOption3());
 
-        Button refreshTable = new Button("Refresh Table");
-        refreshTable.setOnAction(e -> this.clientGUI.refreshTableCommand());
-
         // Add buttons to the buttonBox
-        buttonBox.getChildren().addAll(option1Button, option2Button, option3Button, refreshTable);
+        buttonBox.getChildren().addAll(option1Button, option2Button, option3Button);
         layout.setTop(buttonBox);
 
         this.clientGUI.leaderboardTable = getLeaderboardTable();
