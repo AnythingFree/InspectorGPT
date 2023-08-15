@@ -2,6 +2,7 @@ package client;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Application;
@@ -11,6 +12,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -31,6 +33,7 @@ public class ClientGUI extends Application {
 	volatile Label player2Time;
 	private ChessClockClient clock;
 	Button timerButton;
+	TableView<LeaderboardEntry> leaderboardTable;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -149,7 +152,7 @@ public class ClientGUI extends Application {
 
 	private void startClock() {
 		// start thread for labels
-		clock = new ChessClockClient(this);
+		clock = new ChessClockClient(this, 120); // koliko vremena bi trebao da dobije sa servera
 		clock.startUpdateThread();
 	}
 
@@ -274,8 +277,48 @@ public class ClientGUI extends Application {
 		this.timerButton.setDisable(true);
 	}
 
-    public void enableTimerButton() {
+	public void enableTimerButton() {
 		this.timerButton.setDisable(false);
-    }
+	}
+
+	public void refreshTable(String dataTable) {
+
+		ArrayList<LeaderboardEntry> entries = getEntries(dataTable);
+		// Clear the existing data in the TableView
+		this.leaderboardTable.getItems().clear();
+
+		// Add new entries to the TableView
+		this.leaderboardTable.getItems().addAll(entries);
+
+		// refreash the table
+		this.leaderboardTable.refresh();
+	}
+
+	private ArrayList<LeaderboardEntry> getEntries(String dataTable) {
+		ArrayList<LeaderboardEntry> entries = new ArrayList<LeaderboardEntry>();
+		// iterate through dataTable {usernames:scores}, add username and socres to
+		// entries
+		System.out.println(dataTable);
+		dataTable = dataTable.replaceAll("\\[", "");
+		dataTable = dataTable.replaceAll("\\]", "");
+
+		String[] keyValuePairs = dataTable.split(";");
+
+		for (String pair : keyValuePairs) {
+			String[] keyValue = pair.split(":", 2);
+
+			if (!keyValue.equals("") && keyValue.length == 2) {
+				String username = keyValue[0].trim();
+				String score = keyValue[1].trim();
+				entries.add(new LeaderboardEntry(username, Integer.valueOf(score)));
+			}
+		}
+
+		return entries;
+	}
+
+	public void refreshTableCommand() {
+		writer.println("{type:refreshTable}");
+	}
 
 }

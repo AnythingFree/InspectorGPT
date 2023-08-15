@@ -1,6 +1,5 @@
 package server;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +46,8 @@ public class Channel {
         player1.receiveMessage("You are playing with " + player2.getUsername());
         player2.receiveMessage("You are playing with " + player1.getUsername());
 
-        this.chessClock = new ChessClock(30, this, player1, player2); // 30 seconds
-        // this.playerGPT = new Gpt();
+        this.chessClock = new ChessClock(120, this, player1, player2); // 30 seconds
+        this.playerGPT = new Gpt();
         this.messageHistory = new ArrayList<>();
     }
 
@@ -155,9 +154,9 @@ public class Channel {
                 .forEach(u -> u.receiveMessage("GPT has been added."));
         this.subscribers.stream()
                 .forEach(u -> u.receiveMessage("You have 30 seconds to win the game!"));
-        // this.subscribers.stream()
-        // .forEach(u -> u.receiveMessage("GPTs hint is: " +
-        // this.playerGPT.getTheHint()));
+        this.subscribers.stream()
+                .forEach(u -> u.receiveMessage("GPTs hint is: " +
+                        this.playerGPT.getTheHint()));
     }
 
     public synchronized List<ThreadServer> getSubscribers() {

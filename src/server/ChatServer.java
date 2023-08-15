@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -180,5 +181,17 @@ final class ChatServer {
         prepareChannel(opponentUsername, user2, user1.get());
     }
     // ======================================
+
+    public HashMap<String, Integer> getUserScores() {
+        // iterate through users and get username and score
+        HashMap<String, Integer> userScores = new HashMap<>();
+        synchronized (this.users) {
+            this.users.stream()
+                    .forEach(u -> userScores.put(u.getUsername(), u.getScore()));
+        }
+
+        return userScores;
+
+    }
 
 }

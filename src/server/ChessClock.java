@@ -1,7 +1,5 @@
 package server;
 
-import java.time.Duration;
-
 public class ChessClock {
 
     private volatile int player1Time; // Time in seconds

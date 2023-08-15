@@ -89,6 +89,12 @@ public class ThreadMessageListener extends Thread {
                                 clientGUI.updateTimeLabels(resultMap.get("player1Time"), resultMap.get("player2Time"));
                             });
                             break;
+                        case "refreshTable":
+                            String result = resultMap.get("result").toString();
+                            Platform.runLater(() -> {
+                                clientGUI.refreshTable(result);
+                            });
+                            break;
                     }
                     break;
                 // usernames treba isto biti system message

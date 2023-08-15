@@ -5,18 +5,19 @@ import javafx.application.Platform;
 public class ChessClockClient {
 
     private ClientGUI clientGUI;
-    private volatile int time1 = 30;
-    private volatile int time2 = 30;
-    private boolean isPlayer1Turn=true;
+    private volatile int time1;
+    private volatile int time2;
+    private boolean isPlayer1Turn = true;
 
-
-    public ChessClockClient(ClientGUI clientGUI2) {
+    public ChessClockClient(ClientGUI clientGUI2, int time) {
         this.clientGUI = clientGUI2;
+        this.time1 = time;
+        this.time2 = time;
     }
 
     void startUpdateThread() {
         Thread updateThread = new Thread(() -> {
-            while (time1 != 0 || time2 != 0) {
+            while (time1 > 0 && time2 > 0) {
                 try {
                     Thread.sleep(1000);
 
@@ -51,6 +52,12 @@ public class ChessClockClient {
     // update turn
     public synchronized void updateTurn() {
         this.isPlayer1Turn = !isPlayer1Turn;
+    }
+
+    // stop thread
+    public synchronized void stop() {
+        this.time1 = 0;
+        this.time2 = 0;
     }
 
 }

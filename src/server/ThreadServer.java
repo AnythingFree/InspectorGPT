@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -202,6 +203,10 @@ final class ThreadServer extends Thread {
                             System.out.println("Unknown option: " + option);
                     }
 
+                case "refreshTable":
+                    writer.println("{type:system; data:refreshTable; result:" + getDataForLeaderboard() + "}");
+                    break;
+
                 case "option3":
                     break;
 
@@ -214,6 +219,16 @@ final class ThreadServer extends Thread {
             System.out.println(e.getMessage());
         }
 
+    }
+
+    private String getDataForLeaderboard() {
+        String data = "[";
+        HashMap<String, Integer> leaderboard = this.server.getUserScores();
+        for (String key : leaderboard.keySet()) {
+            data += key + ":" + leaderboard.get(key) + ";";
+        }
+        data += "]";
+        return data;
     }
 
     private void updateTimeLabel(String player1Time, String player2Time) {
