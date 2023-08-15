@@ -152,7 +152,7 @@ public class ClientGUI extends Application {
 
 	private void startClock() {
 		// start thread for labels
-		clock = new ChessClockClient(this, 60*10); // koliko vremena bi trebao da dobije sa servera
+		clock = new ChessClockClient(this, 60 * 10); // koliko vremena bi trebao da dobije sa servera
 		clock.startUpdateThread();
 	}
 
@@ -265,11 +265,20 @@ public class ClientGUI extends Application {
 	}
 
 	synchronized void updateTimeLabels(String time1, String time2) {
-		this.player1Time.setText("Player1: " + time1);
-		this.player2Time.setText("Player2: " + time2);
+		int time1Int = Integer.parseInt(time1);
+		int time2Int = Integer.parseInt(time2);
+		this.player1Time.setText(" Player1: " + _getTimeFormatting(time1Int));
+		this.player2Time.setText(" Player2: " + _getTimeFormatting(time2Int));
 
-		this.clock.updateTime(time1, time2);
+		this.clock.updateTime(time1Int, time2Int);
 		this.clock.updateTurn();
+	}
+
+	private String _getTimeFormatting(int seconds) {
+		int minutes = seconds / 60;
+		int remainingSeconds = seconds % 60;
+
+		return String.format("%02d:%02d", minutes, remainingSeconds);
 	}
 
 	void switchPlayer() {

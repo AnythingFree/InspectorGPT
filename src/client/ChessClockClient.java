@@ -23,12 +23,12 @@ public class ChessClockClient {
 
                     if (isPlayer1Turn)
                         Platform.runLater(() -> {
-                            this.clientGUI.player1Time.setText("Player 1: " + time1--);
+                            this.clientGUI.player1Time.setText("Player 1: " + getTimeFormatting(time1--));
 
                         });
                     else
                         Platform.runLater(() -> {
-                            this.clientGUI.player2Time.setText("Player 2: " + time2--);
+                            this.clientGUI.player2Time.setText("Player 2: " + getTimeFormatting(time2--));
                         });
 
                 } catch (InterruptedException e) {
@@ -43,10 +43,17 @@ public class ChessClockClient {
         updateThread.start();
     }
 
+    private synchronized String getTimeFormatting(int seconds) {
+        int minutes = seconds / 60;
+        int remainingSeconds = seconds % 60;
+
+        return String.format("%02d:%02d", minutes, remainingSeconds);
+    }
+
     // update times
-    public synchronized void updateTime(String time1, String time2) {
-        this.time1 = Integer.parseInt(time1);
-        this.time2 = Integer.parseInt(time2);
+    public synchronized void updateTime(int time1, int time2) {
+        this.time1 = time1;
+        this.time2 = time2;
     }
 
     // update turn

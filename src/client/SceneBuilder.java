@@ -175,8 +175,8 @@ public class SceneBuilder {
             this.clientGUI.switchPlayer();
         });
 
-        this.clientGUI.player1Time = new Label("player1: 30");
-        this.clientGUI.player2Time = new Label("player2: 30");
+        this.clientGUI.player1Time = new Label(" Player1: 10:00");
+        this.clientGUI.player2Time = new Label(" Player2: 10:00");
         root.setTop(new HBox(this.clientGUI.timerButton, this.clientGUI.player1Time, this.clientGUI.player2Time));
 
         scene.setRoot(root);
