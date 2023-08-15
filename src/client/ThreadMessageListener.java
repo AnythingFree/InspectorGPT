@@ -95,6 +95,15 @@ public class ThreadMessageListener extends Thread {
                                 clientGUI.refreshTable(result);
                             });
                             break;
+
+                        case "gameFinished":
+                            String timeLeft = resultMap.get("timeLeft").toString();
+                            Platform.runLater(() -> {
+                                clientGUI.disableInputField();
+                                clientGUI.disableTimerButton();
+                                clientGUI.stopClock(timeLeft);
+                            });
+                            break;
                     }
                     break;
                 // usernames treba isto biti system message

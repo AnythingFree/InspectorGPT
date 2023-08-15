@@ -24,7 +24,6 @@ public class ChessClock {
     public synchronized void start() {
         if (!isRunning) {
             isRunning = true;
-            System.out.println("Clock started");
             this.thread = new Thread(() -> {
                 while (isRunning) {
                     try {
@@ -53,6 +52,7 @@ public class ChessClock {
                         }
 
                     } catch (InterruptedException e) {
+                        System.out.println("systemClock interrupted");
                         ;
                     }
                 }
@@ -64,8 +64,7 @@ public class ChessClock {
 
     public synchronized void stop() {
         isRunning = false;
-
-        System.out.println("Clock stopped");
+        this.thread.interrupt();
     }
 
     public synchronized void switchTurn() {
@@ -90,6 +89,13 @@ public class ChessClock {
 
     public Thread getThread() {
         return this.thread;
+    }
+
+    public int getTimeLeft() {
+        if (isPlayer1Turn)
+            return this.player1Time;
+        else
+            return this.player2Time;
     }
 
 }

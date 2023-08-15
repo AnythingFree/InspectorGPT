@@ -47,7 +47,7 @@ public class Channel {
         player2.receiveMessage("You are playing with " + player1.getUsername());
 
         this.chessClock = new ChessClock(60 * 10, this, player1, player2); // 30 seconds
-        // this.playerGPT = new Gpt();
+        this.playerGPT = new Gpt();
         this.messageHistory = new ArrayList<>();
     }
 
@@ -123,9 +123,12 @@ public class Channel {
                 .forEach(u -> u.receiveMessage("GPT has been removed."));
         this.playerGPT = null;
 
+        // stop the clock
+        this.chessClock.stop();
+
         // signal GUIs to finish game
-        this.player1.signalGameFinished(sender);
-        this.player2.signalGameFinished(sender);
+        this.player1.signalGameFinished(sender, this.chessClock.getTimeLeft());
+        this.player2.signalGameFinished(sender, this.chessClock.getTimeLeft());
     }
 
     private void checkIfsurrender(ThreadServer userThread) {
@@ -155,8 +158,8 @@ public class Channel {
 
         String welcome = "Welcome to the \"" + this.name + "\" channel! \\n" +
                 "Game has started! \\n" +
-                "You have 10 min to win the game! \\n" ;
-                //"GPTs hint is: " + this.playerGPT.getTheHint() + "\\n";
+                "You have 10 min to win the game! \\n" +
+                "GPTs hint is: " + this.playerGPT.getTheHint() + "\\n";
 
         // send notifications to users
         this.subscribers.stream()

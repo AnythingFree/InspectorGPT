@@ -8,6 +8,7 @@ public class ChessClockClient {
     private volatile int time1;
     private volatile int time2;
     private boolean isPlayer1Turn = true;
+    private Thread updateThread;
 
     public ChessClockClient(ClientGUI clientGUI2, int time) {
         this.clientGUI = clientGUI2;
@@ -16,7 +17,7 @@ public class ChessClockClient {
     }
 
     void startUpdateThread() {
-        Thread updateThread = new Thread(() -> {
+        updateThread = new Thread(() -> {
             while (time1 > 0 && time2 > 0) {
                 try {
                     Thread.sleep(1000);
@@ -33,7 +34,7 @@ public class ChessClockClient {
 
                 } catch (InterruptedException e) {
                     // Handle interruption if needed
-                    Thread.currentThread().interrupt();
+                    System.out.println("clientClock interrupted");
                     break;
                 }
             }
@@ -62,9 +63,12 @@ public class ChessClockClient {
     }
 
     // stop thread
-    public synchronized void stop() {
-        this.time1 = 0;
-        this.time2 = 0;
+    public synchronized void stop(int time) {
+        this.updateThread.interrupt();
+        if (isPlayer1Turn)
+            this.clientGUI.player1Time.setText(" Player 1: " + getTimeFormatting(time));
+        else
+            this.clientGUI.player2Time.setText(" Player 2: " + getTimeFormatting(time));
     }
 
 }

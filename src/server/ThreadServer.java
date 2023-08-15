@@ -163,7 +163,7 @@ final class ThreadServer extends Thread {
                 case "scene":
                     String scene = resultMap.get("scene").toString();
                     if (scene.equals("gameMode")) {
-                        //writeHello();
+                        // writeHello();
                         // writeRulesToTheGame();
                         break;
                     }
@@ -237,11 +237,15 @@ final class ThreadServer extends Thread {
         System.out.println("player1: " + player1Time + " player2: " + player2Time);
     }
 
-    void signalGameFinished(ThreadServer winner) {
-        disableInputField();
-        this.writer.println(
-                "{type:system; data:notification; message:Game finished!" +
-                        winner.name + "has won! Your current total score: " + this.score + "}");
+    void signalGameFinished(ThreadServer winner, int timeLeft) {
+        //disableInputField();
+        //disableTimerButton();
+        gameFinished(Integer.toString(timeLeft));
+        sendNotification("Game finished!" + winner.name + "has won! Your current total score: " + this.score);
+    }
+
+    private void gameFinished(String timeLeft) {
+        this.writer.println("{type:system; data:gameFinished; timeLeft:" + timeLeft + "}");
     }
 
     void sendNotification(String message) {

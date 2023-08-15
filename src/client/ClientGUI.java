@@ -152,8 +152,8 @@ public class ClientGUI extends Application {
 
 	private void startClock() {
 		// start thread for labels
-		clock = new ChessClockClient(this, 60 * 10); // koliko vremena bi trebao da dobije sa servera
-		clock.startUpdateThread();
+		this.clock = new ChessClockClient(this, 60 * 10); // koliko vremena bi trebao da dobije sa servera
+		this.clock.startUpdateThread();
 	}
 
 	// =============================================================================
@@ -291,6 +291,11 @@ public class ClientGUI extends Application {
 
 	public void enableTimerButton() {
 		this.timerButton.setDisable(false);
+	}
+
+	public void stopClock(String timeLeft) {
+		int time = Integer.parseInt(timeLeft);
+		this.clock.stop(time);
 	}
 
 	public void refreshTable(String dataTable) {
