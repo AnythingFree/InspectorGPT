@@ -8,11 +8,11 @@ public class JavaRunCommand {
     public static void main(String[] args) {
         try {
 
-            // venv with OpenAI lib 
-            String pythonInterpreter = "C:\\Users\\katar\\OneDrive\\Radna površina\\VS-InspectorGPT\\venvOpenAI\\Scripts\\python.exe";
+            // venv with OpenAI lib        
+            String pythonInterpreter = "C:\\Users\\MARIJA MALIC\\Desktop\\Ors4Folder\\venvOpenAI\\Scripts\\python.exe";
 
             // execute python script
-            ProcessBuilder processBuilder = new ProcessBuilder(pythonInterpreter, "src\\GPT\\callGPT.py");
+            ProcessBuilder processBuilder = new ProcessBuilder(pythonInterpreter, "src\\GPT\\callGPT.py","Mare");
             Process process = processBuilder.start();
 
             // Get the input stream from the process
@@ -38,7 +38,7 @@ public class JavaRunCommand {
         try {
 
             // venv with OpenAI lib 
-            String pythonInterpreter = "C:\\Users\\katar\\OneDrive\\Radna površina\\VS-InspectorGPT\\venvOpenAI\\Scripts\\python.exe";
+            String pythonInterpreter = "C:\\Users\\MARIJA MALIC\\Desktop\\Ors4Folder\\venvOpenAI\\Scripts\\python.exe";
 
             // execute python script
             ProcessBuilder processBuilder = new ProcessBuilder(pythonInterpreter, "src\\GPT\\callGPT.py", question);
