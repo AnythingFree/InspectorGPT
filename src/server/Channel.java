@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import GPT.Gpt;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableView;
 
 
  /* 
@@ -225,5 +228,12 @@ public class Channel {
 
     public Thread getClockThread() {
         return this.chessClock.getThread();
+    }
+
+    // poziv iz SceneBuilder-a
+    public ObservableList<Channel> getChannels() {
+        ObservableList<Channel> channels=FXCollections.observableArrayList();
+        channels.add(this); // Dodaj trenutni kanal u listu
+        return channels;
     }
 }

@@ -123,6 +123,10 @@ public class ClientGUI extends Application {
 
 	void handleOption3() {
 		System.out.println("Option 3 clicked");
+		//get free channels
+		writer.println("{type:channels; data:free}");
+		// ask to change scene to scene3
+		writer.println("{type:scene; scene:option3}");
 	}
 
 	// ===========SCENES (zovu se iz THREADMESSAGELISTENER)=================
@@ -139,6 +143,14 @@ public class ClientGUI extends Application {
 	void getScene2() {
 		primaryStage.setTitle("Option 2: " + this.name);
 		Scene scene = this.sceneBuilder.getOption2Scene(getUserList());
+		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(e -> {
+			closeApp();
+		});
+	}
+	void getScene3() {
+		primaryStage.setTitle("Option 3: " + this.name);
+		Scene scene = this.sceneBuilder.getOption3Scene(getUserList());
 		primaryStage.setScene(scene);
 		primaryStage.setOnCloseRequest(e -> {
 			closeApp();

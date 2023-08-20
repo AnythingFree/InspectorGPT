@@ -6,41 +6,6 @@
     "configurations": [
         {
             "type": "java",
-            "name": "ChessClock",
-            "request": "launch",
-            "mainClass": "server.ChessClock",
-            "projectName": "VS-InspectorGPT_b40fc9cf"
-        },
-        {
-            "type": "java",
-            "name": "ChatGPTAPIExample",
-            "request": "launch",
-            "mainClass": "GPT.TEST.ChatGPTAPIExample",
-            "projectName": "VS-InspectorGPT_b40fc9cf"
-        },
-        {
-            "type": "java",
-            "name": "Test",
-            "request": "launch",
-            "mainClass": "GPT.Test",
-            "projectName": "VS-InspectorGPT_b40fc9cf"
-        },
-        {
-            "type": "java",
-            "name": "_JsonUtil",
-            "request": "launch",
-            "mainClass": "client._JsonUtil",
-            "projectName": "VS-InspectorGPT_b40fc9cf"
-        },
-        {
-            "type": "java",
-            "name": "JsonUtil",
-            "request": "launch",
-            "mainClass": "client.JsonUtil",
-            "projectName": "VS-InspectorGPT_b40fc9cf"
-        },
-        {
-            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"
@@ -50,36 +15,43 @@
             "name": "JavaRunCommand",
             "request": "launch",
             "mainClass": "GPT.JavaRunCommand",
-            "projectName": "VS-InspectorGPT_b40fc9cf"
+            "projectName": "Ors4Folder_75553301"
+        },
+        {
+            "type": "java",
+            "name": "Test",
+            "request": "launch",
+            "mainClass": "GPT.Test",
+            "projectName": "Ors4Folder_75553301"
         },
         {
             "type": "java",
             "name": "ClientGUI",
             "request": "launch",
             "mainClass": "client.ClientGUI",
-            "projectName": "VS-InspectorGPT_b40fc9cf",
+            "projectName": "Ors4Folder_75553301",
             "vmArgs": "--module-path \"C:\\Program Files\\Java\\javafx-sdk-20.0.2\\lib\" --add-modules javafx.controls,javafx.fxml"
         },
         {
             "type": "java",
-            "name": "UsernameInputDialog",
+            "name": "_JsonUtil",
             "request": "launch",
-            "mainClass": "client.UsernameInputDialog",
-            "projectName": "VS-InspectorGPT_b40fc9cf"
+            "mainClass": "client._JsonUtil",
+            "projectName": "Ors4Folder_75553301"
         },
         {
             "type": "java",
             "name": "ChatServer",
             "request": "launch",
             "mainClass": "server.ChatServer",
-            "projectName": "VS-InspectorGPT_b40fc9cf"
+            "projectName": "Ors4Folder_75553301"
         },
         {
             "type": "java",
-            "name": "Test",
+            "name": "Test(1)",
             "request": "launch",
             "mainClass": "test.Test",
-            "projectName": "VS-InspectorGPT_b40fc9cf",
+            "projectName": "Ors4Folder_75553301",
             "vmArgs": "--module-path \"C:\\Program Files\\Java\\javafx-sdk-20.0.2\\lib\" --add-modules javafx.controls,javafx.fxml"
         }
     ]

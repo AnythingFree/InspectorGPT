@@ -3,6 +3,7 @@ package client;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -17,10 +18,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import server.Channel;
 
 public class SceneBuilder {
 
     private ClientGUI clientGUI;
+    private Channel channel;
 
     public SceneBuilder(ClientGUI clientGUI, Stage primaryStage) {
         this.clientGUI = clientGUI;
@@ -67,6 +70,19 @@ public class SceneBuilder {
         leaderboardTable.getColumns().addAll(nameColumn, scoreColumn);
 
         return leaderboardTable;
+    }
+
+    // Create a TableView of  channels
+     private TableView<Channel> getChannelsTable() {
+        // Create a TableView and define columns
+        TableView<Channel> channelsTable = new TableView<>();
+        
+        // Bind columns to data model properties
+       ObservableList<Channel> channels=channel.getChannels();
+        // Add columns to the table
+        channelsTable.setItems(channels);
+
+        return channelsTable;
     }
 
     public Scene getChatScene() {
@@ -139,6 +155,29 @@ public class SceneBuilder {
         userListLayout.setBottom(bottomContainer);
 
         Scene scene = new Scene(userListLayout, 300, 200);
+        return scene;
+
+    }
+    //uradi za opciju 3!!
+    public Scene getOption3Scene(List<String> channelList) {
+        BorderPane channelListLayout = new BorderPane();
+
+        // Create a ListView to display the channel list
+        ListView<String> channelListView = new ListView<>();
+        channelListView.getItems().addAll(channelList);
+        
+
+
+        channelListLayout.setCenter(channelListView);
+        // backButton
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> this.clientGUI.goBackToMainWindow());
+        
+
+        // put them on bottom
+        channelListLayout.setBottom(backButton);
+
+        Scene scene = new Scene(channelListLayout, 300, 200);
         return scene;
 
     }
