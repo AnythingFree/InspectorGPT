@@ -53,11 +53,11 @@ public class SceneBuilder {
         return scene;
     }
 
-    private TableView<LeaderboardEntry> getLeaderboardTable() {
+    private TableView<_LeaderboardEntry> getLeaderboardTable() {
         // Create a TableView and define columns
-        TableView<LeaderboardEntry> leaderboardTable = new TableView<>();
-        TableColumn<LeaderboardEntry, String> nameColumn = new TableColumn<>("Name");
-        TableColumn<LeaderboardEntry, Integer> scoreColumn = new TableColumn<>("Score");
+        TableView<_LeaderboardEntry> leaderboardTable = new TableView<>();
+        TableColumn<_LeaderboardEntry, String> nameColumn = new TableColumn<>("Name");
+        TableColumn<_LeaderboardEntry, Integer> scoreColumn = new TableColumn<>("Score");
 
         // Bind columns to data model properties
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().getName());

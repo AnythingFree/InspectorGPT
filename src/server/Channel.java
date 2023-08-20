@@ -5,12 +5,8 @@ import java.util.List;
 
 import GPT.Gpt;
 
-/**
- * Channel class is used to represent a channel in the server. It contains
- * information about the channel name, subscribers, players, game, message
- * history and chess clock.
- * 
- * 
+
+ /* 
  * @TODO: razdvojiti u dva kanala/sobe, jedan za general chat, drugi za igru,
  *        treba
  *        rijesiti posmatrace
@@ -95,6 +91,7 @@ public class Channel {
     private synchronized void getResponseGPT(ThreadServer sender) {
 
         String response = "[GPT]: " + this.playerGPT.getResponse(this.messageHistory);
+
         this.subscribers.stream()
                 .forEach(u -> u.receiveMessage(response));
 
@@ -161,7 +158,7 @@ public class Channel {
                 "You have 10 min to win the game! \\n" +
                 "GPTs hint is: " + this.playerGPT.getTheHint() + "\\n";
 
-        // send notifications to users
+        // send welcome message to users
         this.subscribers.stream()
                 .forEach(u -> u.receiveMessage(rules));
 

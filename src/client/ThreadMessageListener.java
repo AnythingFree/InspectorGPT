@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javafx.application.Platform;
+import util._JsonUtil;
 
 public class ThreadMessageListener extends Thread {
     private ClientGUI clientGUI;
