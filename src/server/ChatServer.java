@@ -133,6 +133,12 @@ final class ChatServer {
         channel.start();
     }
 
+    public List<String> getChannels() {
+        return this.allChannels.stream()
+                .map(Channel::getName)
+                .collect(Collectors.toList());
+    }
+
     // ==PLAY GAME====
     public void sendRequestTo(String usernameOpponent, String username) {
         Optional<ThreadServer> foundUser;

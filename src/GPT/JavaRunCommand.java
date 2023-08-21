@@ -9,7 +9,7 @@ public class JavaRunCommand {
         try {
 
             // venv with OpenAI lib        
-            String pythonInterpreter = "C:\\Users\\MARIJA MALIC\\Desktop\\Ors4Folder\\venvOpenAI\\Scripts\\python.exe";
+            String pythonInterpreter = "C:\\Users\\katar\\OneDrive\\Radna povr\u0161ina\\VS-InspectorGPT\\venvOpenAI\\Scripts\\python.exe";
 
             // execute python script
             ProcessBuilder processBuilder = new ProcessBuilder(pythonInterpreter, "src\\GPT\\callGPT.py","Mare");
@@ -38,7 +38,7 @@ public class JavaRunCommand {
         try {
 
             // venv with OpenAI lib 
-            String pythonInterpreter = "C:\\Users\\MARIJA MALIC\\Desktop\\Ors4Folder\\venvOpenAI\\Scripts\\python.exe";
+            String pythonInterpreter = "C:\\Users\\katar\\OneDrive\\Radna povr\u0161ina\\VS-InspectorGPT\\venvOpenAI\\Scripts\\python.exe";
 
             // execute python script
             ProcessBuilder processBuilder = new ProcessBuilder(pythonInterpreter, "src\\GPT\\callGPT.py", question);

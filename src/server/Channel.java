@@ -8,12 +8,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableView;
 
-
- /* 
- * @TODO: razdvojiti u dva kanala/sobe, jedan za general chat, drugi za igru,
- *        treba
- *        rijesiti posmatrace
- */
+/* 
+* @TODO: razdvojiti u dva kanala/sobe, jedan za general chat, drugi za igru,
+*        treba
+*        rijesiti posmatrace
+*/
 public class Channel {
     private final String name;
     private final List<ThreadServer> subscribers;
@@ -230,10 +229,4 @@ public class Channel {
         return this.chessClock.getThread();
     }
 
-    // poziv iz ThreadServer-a
-    public List<String> getChannels() {
-        List<String> channels=new ArrayList<>();
-        channels.add(this.name); // Dodaj trenutni kanal u listu
-        return channels;
-    }
 }

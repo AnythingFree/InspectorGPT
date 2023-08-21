@@ -71,7 +71,6 @@ public class SceneBuilder {
         return leaderboardTable;
     }
 
-
     public Scene getChatScene() {
         BorderPane layout = new BorderPane();
 
@@ -145,21 +144,19 @@ public class SceneBuilder {
         return scene;
 
     }
-    //uradi za opciju 3!!
+
+    // uradi za opciju 3!!
     public Scene getOption3Scene(List<String> channelList) {
         BorderPane channelListLayout = new BorderPane();
-        System.out.println("getoption3scene"+"  " + channelList);
+        System.out.println("getoption3scene" + "  " + channelList);
         // Create a ListView to display the channel list
         ListView<String> channelListView = new ListView<>();
         channelListView.getItems().addAll(channelList);
-        
-
 
         channelListLayout.setCenter(channelListView);
         // backButton
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> this.clientGUI.goBackToMainWindow());
-        
 
         // put them on bottom
         channelListLayout.setBottom(backButton);

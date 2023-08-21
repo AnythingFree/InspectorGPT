@@ -128,7 +128,7 @@ public class ClientGUI extends Application {
 
 	void handleOption3() {
 		System.out.println("Option 3 clicked");
-		//get free channels
+		// get free channels
 		writer.println("{type:channels; data:free}");
 		// ask to change scene to scene3
 		writer.println("{type:scene; scene:option3}");
@@ -153,6 +153,7 @@ public class ClientGUI extends Application {
 			closeApp();
 		});
 	}
+
 	void getScene3() {
 		primaryStage.setTitle("Option 3: " + this.name);
 		Scene scene = this.sceneBuilder.getOption3Scene(getChannelsList());
@@ -369,30 +370,31 @@ public class ClientGUI extends Application {
 
 		return entries;
 	}
-	//===========================================================
-	//moja proba
+
+	// ===========================================================
+	// moja proba
 	public void refreshTableCommand() {
 		writer.println("{type:refreshTable}");
 	}
 
-
-	
 	private List<String> channels;
-	public List<String> getChannelsList(){
+
+	public List<String> getChannelsList() {
 		System.out.println("getChannelsList");
 		return this.channels;
-		
+
 	}
 
-	public void getChannels(ArrayList<String> channelNames) {
-		 TableView<String> channelTableView=new TableView<>();
+	public void getChannels(List<String> channelNames) {
+		TableView<String> channelTableView = new TableView<>();
 
-    	 TableColumn<String, String> imeKanalaColumn=new TableColumn<>();
-		 imeKanalaColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
-		
-		 ObservableList<String> channels = FXCollections.observableArrayList(channelNames);
-         channelTableView.setItems(channels);
-		this.channels=channelNames;
-		System.out.println("getChannels"+"   "+channelNames);
+		TableColumn<String, String> imeKanalaColumn = new TableColumn<>();
+		imeKanalaColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()));
+
+		ObservableList<String> channels = FXCollections.observableArrayList(channelNames);
+		channelTableView.setItems(channels);
+
+		this.channels = channelNames;
+		System.out.println("getChannels" + "   " + channelNames);
 	}
 }

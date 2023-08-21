@@ -110,7 +110,7 @@ public class ThreadMessageListener extends Thread {
                 // usernames treba isto biti system message
                 case "usernames":
                     System.out.println(resultMap.get("data"));
-                    clientGUI.setUserList(_getUserList(resultMap.get("data")));
+                    clientGUI.setUserList(_getListFromString(resultMap.get("data")));
                     break;
 
                 case "request":
@@ -154,8 +154,7 @@ public class ThreadMessageListener extends Thread {
                         Platform.runLater(() -> {
                             clientGUI.getScene1();
                         });
-                    }
-                    else if (scene.equals("option3")) {
+                    } else if (scene.equals("option3")) {
                         Platform.runLater(() -> {
                             clientGUI.getScene3();
                         });
@@ -163,25 +162,13 @@ public class ThreadMessageListener extends Thread {
 
                     break;
                 case "channels":
-                    // Handle channels message
-                    //String channel = resultMap.get("channels").toString();
-                    System.out.println("threadMessageListener");
-                    Object channelsObject = resultMap.get("channels");
-                    ArrayList<String> channels;
-                    if (channelsObject != null) {
-                    String jsonString = channelsObject.toString();
-                    jsonString = jsonString.replaceAll("nešto", "nešto drugo");
-                    // Nastavi sa obradom jsonString-a
-                    channels= new ArrayList<>(Arrays.asList(jsonString.split(",")));
-                    } else {
-                    // Postavi logiku za obradu kada je vrednost "channels" null
-                         channels= new ArrayList<>();
+                    String channelsString = resultMap.get("data");
+                    List<String> channels = _getListFromString(channelsString);
 
-                        }
-                     Platform.runLater(() -> {
-                    clientGUI.getChannels(channels);
+                    Platform.runLater(() -> {
+                        clientGUI.getChannels(channels);
                     });
-                    
+
                     break;
 
                 // Add more cases for other message types as needed
@@ -197,15 +184,15 @@ public class ThreadMessageListener extends Thread {
         }
     }
 
-    private List<String> _getUserList(String usernames) {
+    private List<String> _getListFromString(String string) {
         List<String> userList = new ArrayList<>();
-        if (!usernames.equals("[null]")) {
+        if (!string.equals("[null]")) {
 
             // Remove brackets
-            usernames = usernames.substring(1, usernames.length() - 1);
+            string = string.substring(1, string.length() - 1);
 
             // Split by ", " to get a list of usernames
-            userList = new ArrayList<>(Arrays.asList(usernames.split(", ")));
+            userList = new ArrayList<>(Arrays.asList(string.split(", ")));
 
         }
         return userList;

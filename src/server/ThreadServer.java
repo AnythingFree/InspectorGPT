@@ -82,7 +82,6 @@ final class ThreadServer extends Thread {
             // Handle the message based on its type using a switch-case statement
             List<String> usernames;
             String data;
-            List<String> channels;
             switch (messageType) {
 
                 case "setName":
@@ -144,7 +143,8 @@ final class ThreadServer extends Thread {
                     this.currentChannel = channel;
                     writeHello();
 
-                    writer.println("{type:chat; data: Connected users: " + this.server.getUsersFromChannel(channelName) + "}");
+                    writer.println(
+                            "{type:chat; data: Connected users: " + this.server.getUsersFromChannel(channelName) + "}");
                     break;
 
                 case "unsubscribe":
@@ -209,9 +209,10 @@ final class ThreadServer extends Thread {
 
                 case "option3":
                     break;
+
                 case "channels":
-                    channels=currentChannel.getChannels();
-                    writer.println("{type:channels; data: Free channels" + channels.toString() + "}");
+                    List<String> channels = this.server.getChannels();
+                    writer.println("{type:channels; data:" + channels.toString() + "}");
                     break;
 
                 default:
@@ -238,11 +239,11 @@ final class ThreadServer extends Thread {
     private void updateTimeLabel(String player1Time, String player2Time) {
         this.writer.println("{type:system; data:TimeLabel; player1Time:" + player1Time
                 + "; player2Time:" + player2Time + "}");
-   }
+    }
 
     void signalGameFinished(ThreadServer winner, int timeLeft) {
-        //disableInputField();
-        //disableTimerButton();
+        // disableInputField();
+        // disableTimerButton();
         gameFinished(Integer.toString(timeLeft));
         sendNotification("Game finished!" + winner.name + "has won! Your current total score: " + this.score);
     }
@@ -328,7 +329,5 @@ final class ThreadServer extends Thread {
     public synchronized void setScore(int score) {
         this.score = score;
     }
-
-   
 
 }
