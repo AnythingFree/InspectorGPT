@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import client._JsonUtil;
+import util._JsonUtil;
 
 final class ThreadServer extends Thread {
     private BufferedReader reader;
@@ -41,7 +41,7 @@ final class ThreadServer extends Thread {
         try {
             while (!Thread.currentThread().isInterrupted() && !this.client.isClosed()) {
                 message = this.reader.readLine();
-                if (message.equals("close"))
+                if (message.equals("close")) // ovo stoji jer klijent kad zatvori ovo ostane otvroneo
                     break;
                 handleIncomingMessage(message);
             }
@@ -144,8 +144,7 @@ final class ThreadServer extends Thread {
                     this.currentChannel = channel;
                     writeHello();
 
-                    writer.println(
-                            "{type:chat; data: Connected users: " + this.server.getUsersFromChannel(channelName) + "}");
+                    writer.println("{type:chat; data: Connected users: " + this.server.getUsersFromChannel(channelName) + "}");
                     break;
 
                 case "unsubscribe":
@@ -177,7 +176,7 @@ final class ThreadServer extends Thread {
                         case "switchPlayer":
                             this.currentChannel.pauseClock();
                             try {
-                                this.currentChannel.getClockThread().join(); // Sleep for 5 seconds
+                                this.currentChannel.getClockThread().join();
                             } catch (InterruptedException e) {
                                 System.out.println("Nesto se desilo dok se sat zaustavljau u threadserveru");
                                 ;
@@ -239,8 +238,7 @@ final class ThreadServer extends Thread {
     private void updateTimeLabel(String player1Time, String player2Time) {
         this.writer.println("{type:system; data:TimeLabel; player1Time:" + player1Time
                 + "; player2Time:" + player2Time + "}");
-        System.out.println("player1: " + player1Time + " player2: " + player2Time);
-    }
+   }
 
     void signalGameFinished(ThreadServer winner, int timeLeft) {
         //disableInputField();
@@ -331,8 +329,6 @@ final class ThreadServer extends Thread {
         this.score = score;
     }
 
-    public void blokiraj() {
-        disableInputField();
-    }
+   
 
 }

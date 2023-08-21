@@ -38,7 +38,7 @@ public class ClientGUI extends Application {
 	volatile Label player2Time;
 	private ChessClockClient clock;
 	Button timerButton;
-	TableView<LeaderboardEntry> leaderboardTable;
+	TableView<_LeaderboardEntry> leaderboardTable;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -337,7 +337,7 @@ public class ClientGUI extends Application {
 
 	public void refreshTable(String dataTable) {
 
-		ArrayList<LeaderboardEntry> entries = getEntries(dataTable);
+		ArrayList<_LeaderboardEntry> entries = getEntries(dataTable);
 		// Clear the existing data in the TableView
 		this.leaderboardTable.getItems().clear();
 
@@ -348,8 +348,8 @@ public class ClientGUI extends Application {
 		this.leaderboardTable.refresh();
 	}
 
-	private ArrayList<LeaderboardEntry> getEntries(String dataTable) {
-		ArrayList<LeaderboardEntry> entries = new ArrayList<LeaderboardEntry>();
+	private ArrayList<_LeaderboardEntry> getEntries(String dataTable) {
+		ArrayList<_LeaderboardEntry> entries = new ArrayList<_LeaderboardEntry>();
 		// iterate through dataTable {usernames:scores}, add username and socres to
 		// entries
 		dataTable = dataTable.replaceAll("\\[", "");
@@ -363,7 +363,7 @@ public class ClientGUI extends Application {
 			if (!keyValue.equals("") && keyValue.length == 2) {
 				String username = keyValue[0].trim();
 				String score = keyValue[1].trim();
-				entries.add(new LeaderboardEntry(username, Integer.valueOf(score)));
+				entries.add(new _LeaderboardEntry(username, Integer.valueOf(score)));
 			}
 		}
 
