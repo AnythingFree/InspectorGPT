@@ -23,7 +23,6 @@ import server.Channel;
 public class SceneBuilder {
 
     private ClientGUI clientGUI;
-    private Channel channel;
 
     public SceneBuilder(ClientGUI clientGUI, Stage primaryStage) {
         this.clientGUI = clientGUI;
@@ -72,18 +71,6 @@ public class SceneBuilder {
         return leaderboardTable;
     }
 
-    // Create a TableView of  channels
-     private TableView<Channel> getChannelsTable() {
-        // Create a TableView and define columns
-        TableView<Channel> channelsTable = new TableView<>();
-        
-        // Bind columns to data model properties
-       ObservableList<Channel> channels=channel.getChannels();
-        // Add columns to the table
-        channelsTable.setItems(channels);
-
-        return channelsTable;
-    }
 
     public Scene getChatScene() {
         BorderPane layout = new BorderPane();
@@ -161,7 +148,7 @@ public class SceneBuilder {
     //uradi za opciju 3!!
     public Scene getOption3Scene(List<String> channelList) {
         BorderPane channelListLayout = new BorderPane();
-
+        System.out.println("getoption3scene"+"  " + channelList);
         // Create a ListView to display the channel list
         ListView<String> channelListView = new ListView<>();
         channelListView.getItems().addAll(channelList);

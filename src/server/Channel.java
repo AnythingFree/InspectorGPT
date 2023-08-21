@@ -233,10 +233,10 @@ public class Channel {
         return this.chessClock.getThread();
     }
 
-    // poziv iz SceneBuilder-a
-    public ObservableList<Channel> getChannels() {
-        ObservableList<Channel> channels=FXCollections.observableArrayList();
-        channels.add(this); // Dodaj trenutni kanal u listu
+    // poziv iz ThreadServer-a
+    public List<String> getChannels() {
+        List<String> channels=new ArrayList<>();
+        channels.add(this.name); // Dodaj trenutni kanal u listu
         return channels;
     }
 }

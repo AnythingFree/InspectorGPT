@@ -82,6 +82,7 @@ final class ThreadServer extends Thread {
             // Handle the message based on its type using a switch-case statement
             List<String> usernames;
             String data;
+            List<String> channels;
             switch (messageType) {
 
                 case "setName":
@@ -208,6 +209,10 @@ final class ThreadServer extends Thread {
                     break;
 
                 case "option3":
+                    break;
+                case "channels":
+                    channels=currentChannel.getChannels();
+                    writer.println("{type:channels; data: Free channels" + channels.toString() + "}");
                     break;
 
                 default:

@@ -154,7 +154,33 @@ public class ThreadMessageListener extends Thread {
                             clientGUI.getScene1();
                         });
                     }
+                    else if (scene.equals("option3")) {
+                        Platform.runLater(() -> {
+                            clientGUI.getScene3();
+                        });
+                    }
 
+                    break;
+                case "channels":
+                    // Handle channels message
+                    //String channel = resultMap.get("channels").toString();
+                    System.out.println("threadMessageListener");
+                    Object channelsObject = resultMap.get("channels");
+                    ArrayList<String> channels;
+                    if (channelsObject != null) {
+                    String jsonString = channelsObject.toString();
+                    jsonString = jsonString.replaceAll("nešto", "nešto drugo");
+                    // Nastavi sa obradom jsonString-a
+                    channels= new ArrayList<>(Arrays.asList(jsonString.split(",")));
+                    } else {
+                    // Postavi logiku za obradu kada je vrednost "channels" null
+                         channels= new ArrayList<>();
+
+                        }
+                     Platform.runLater(() -> {
+                    clientGUI.getChannels(channels);
+                    });
+                    
                     break;
 
                 // Add more cases for other message types as needed
