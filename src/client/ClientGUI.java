@@ -372,7 +372,7 @@ public class ClientGUI extends Application {
 	}
 
 	// ===========================================================
-	// moja proba
+	
 	public void refreshTableCommand() {
 		writer.println("{type:refreshTable}");
 	}
@@ -396,5 +396,9 @@ public class ClientGUI extends Application {
 
 		this.channels = channelNames;
 		System.out.println("getChannels" + "   " + channelNames);
+	}
+
+	public void watchChatScene(){
+		this.sceneBuilder.getChatScene();
 	}
 }

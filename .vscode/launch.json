@@ -6,6 +6,14 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ClientGUI",
+            "request": "launch",
+            "mainClass": "client.ClientGUI",
+            "projectName": "Ors4Folder_75553301",
+            "vmArgs": "--module-path \"C:\\Program Files\\Java\\javafx-sdk-20.0.2\\lib\" --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
             "name": "ChessClock",
             "request": "launch",
             "mainClass": "server.ChessClock",

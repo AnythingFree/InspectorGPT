@@ -157,9 +157,28 @@ public class SceneBuilder {
         // backButton
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> this.clientGUI.goBackToMainWindow());
+        // watch Button
+        Button watchButton = new Button("Watch");
+
+        // Create a VBox to hold both the back button and the input box
+        HBox bottomContainer = new HBox(watchButton, backButton);
+        bottomContainer.setSpacing(10); // Set spacing between components
+
 
         // put them on bottom
-        channelListLayout.setBottom(backButton);
+        channelListLayout.setBottom(bottomContainer);
+        // kada se klikne na kanal treba da se otvori chat da klijent moze da gleda
+        
+        watchButton.setOnAction(e -> {
+            String selectedChannel = channelListView.getSelectionModel().getSelectedItem();
+            if(selectedChannel.equals("general")){
+                this.clientGUI.getScene1();
+            }
+            if (selectedChannel != null) {
+                this.clientGUI.watchChatScene();
+            }
+        });
+
 
         Scene scene = new Scene(channelListLayout, 300, 200);
         return scene;
