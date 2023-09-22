@@ -36,7 +36,7 @@ public class ThreadMessageListener extends Thread {
                 handleIncomingMessage(message);
             }
         } catch (IOException e) {
-            System.out.println("Error reading message from server: " + e.getMessage());
+            System.out.println("Stop reading messages from server: " + e.getMessage());
         } finally {
             System.out.println("Message listener thread stopped");
         }
@@ -56,27 +56,15 @@ public class ThreadMessageListener extends Thread {
                     String data = resultMap.get("data").toString();
 
                     switch (data) {
-                        case "inputFiledOFF":
-                            Platform.runLater(() -> {
-                                clientGUI.disableInputField();
-                            });
-                            break;
-
-                        case "inputFiledON":
-                            Platform.runLater(() -> {
-                                clientGUI.enableInputField();
-                            });
-                            break;
-
-                        case "TimerButton":
+                        case "Buttons":
                             String state = resultMap.get("state").toString();
                             if (state.equals("ON"))
                                 Platform.runLater(() -> {
-                                    clientGUI.enableTimerButton();
+                                    clientGUI.enableButtons();
                                 });
                             else
                                 Platform.runLater(() -> {
-                                    clientGUI.disableTimerButton();
+                                    clientGUI.disableButtons();
                                 });
                             break;
 
@@ -100,9 +88,10 @@ public class ThreadMessageListener extends Thread {
                         case "gameFinished":
                             String timeLeft = resultMap.get("timeLeft").toString();
                             Platform.runLater(() -> {
-                                clientGUI.disableInputField();
-                                clientGUI.disableTimerButton();
+                                clientGUI.disableButtons();
                                 clientGUI.stopClock(timeLeft);
+                                clientGUI.setTitle("Game Finished");
+                                
                             });
                             break;
                     }
@@ -130,7 +119,7 @@ public class ThreadMessageListener extends Thread {
                         });
                     } else {
                         Platform.runLater(() -> {
-                            clientGUI.playGame();
+                            clientGUI.playGameScene();
                         });
                     }
                     break;
@@ -138,7 +127,14 @@ public class ThreadMessageListener extends Thread {
                 case "chat":
                     // Handle chat message
                     Platform.runLater(() -> {
-                        clientGUI.appendToChatArea(resultMap.get("data"));
+                        clientGUI.appendToChatArea(resultMap.get("data"), clientGUI.chatArea);
+                    });
+                    break;
+
+                case "chat2":
+                    // Handle chat message
+                    Platform.runLater(() -> {
+                        clientGUI.appendToChatArea(resultMap.get("data"), clientGUI.chatArea2);
                     });
                     break;
 
@@ -166,7 +162,7 @@ public class ThreadMessageListener extends Thread {
                     List<String> channels = _getListFromString(channelsString);
 
                     Platform.runLater(() -> {
-                        clientGUI.getChannels(channels);
+                        clientGUI.setChannels(channels);
                     });
 
                     break;

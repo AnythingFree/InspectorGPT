@@ -8,10 +8,10 @@ public class ChessClock {
     private volatile boolean isRunning; // Indicates if the clock is running
     private ThreadServer player1;
     private ThreadServer player2;
-    private Channel channel;
+    private ChannelGame channel;
     private Thread thread;
 
-    public ChessClock(int initialTime, Channel channel, ThreadServer player1, ThreadServer player2) {
+    public ChessClock(int initialTime, ChannelGame channel, ThreadServer player1, ThreadServer player2) {
         this.player1Time = initialTime;
         this.player2Time = initialTime;
         this.isPlayer1Turn = true;

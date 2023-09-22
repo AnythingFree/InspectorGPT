@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Server",
+            "request": "launch",
+            "mainClass": "server.Server",
+            "projectName": "VS-InspectorGPT_b40fc9cf"
+        },
+        {
+            "type": "java",
             "name": "ClientGUI",
             "request": "launch",
             "mainClass": "client.ClientGUI",

@@ -3,7 +3,6 @@ package client;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -11,19 +10,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import server.Channel;
 
 public class SceneBuilder {
 
@@ -40,13 +34,13 @@ public class SceneBuilder {
         HBox buttonBox = new HBox(10); // 10 is the spacing between buttons
 
         // Create buttons for the options
-        Button option1Button = new Button("Option 1");
+        Button option1Button = new Button("General Chat");
         option1Button.setOnAction(e -> this.clientGUI.handleOption1());
 
-        Button option2Button = new Button("Option 2");
+        Button option2Button = new Button("Play Game");
         option2Button.setOnAction(e -> this.clientGUI.handleOption2());
 
-        Button option3Button = new Button("Option 3");
+        Button option3Button = new Button("Watch Game");
         option3Button.setOnAction(e -> this.clientGUI.handleOption3());
 
         // Add buttons to the buttonBox
@@ -87,6 +81,7 @@ public class SceneBuilder {
         // create inputField, sendButton
         this.clientGUI.inputField = new TextField();
         Button sendButton = new Button("Send");
+        sendButton.setId("SendButton");
         sendButton.setOnAction(e -> this.clientGUI.sendMessage());
 
         // Set an event listener for the Enter key press event on the TextField
@@ -153,37 +148,32 @@ public class SceneBuilder {
     // uradi za opciju 3!!
     public Scene getOption3Scene(List<String> channelList) {
         BorderPane channelListLayout = new BorderPane();
-        System.out.println("getoption3scene" + "  " + channelList);
+
         // Create a ListView to display the channel list
         ListView<String> channelListView = new ListView<>();
         channelListView.getItems().addAll(channelList);
-
         channelListLayout.setCenter(channelListView);
+
         // backButton
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> this.clientGUI.goBackToMainWindow());
+
         // watch Button
         Button watchButton = new Button("Watch");
+        watchButton.setOnAction(e -> {
+            String selectedChannel = channelListView.getSelectionModel().getSelectedItem();
+            if (selectedChannel != null) {
+                this.clientGUI.watchChatScene(selectedChannel);
+            }
+        });
 
         // Create a VBox to hold both the back button and the input box
         HBox bottomContainer = new HBox(watchButton, backButton);
         bottomContainer.setSpacing(10); // Set spacing between components
 
-
         // put them on bottom
         channelListLayout.setBottom(bottomContainer);
         // kada se klikne na kanal treba da se otvori chat da klijent moze da gleda
-        
-        watchButton.setOnAction(e -> {
-            String selectedChannel = channelListView.getSelectionModel().getSelectedItem();
-            if(selectedChannel.equals("general")){
-                this.clientGUI.getScene1();
-            }
-            if (selectedChannel != null) {
-                this.clientGUI.watchChatScene();
-            }
-        });
-
 
         Scene scene = new Scene(channelListLayout, 300, 200);
         return scene;
@@ -213,91 +203,73 @@ public class SceneBuilder {
         Scene scene = getChatScene();
 
         BorderPane root = (BorderPane) scene.getRoot();
-        this.clientGUI.timerButton = new Button("Timer");
+        Button timerButton = new Button("Timer");
+        timerButton.setId("TimerButton");
 
-        this.clientGUI.timerButton.setOnAction(e -> {
+        timerButton.setOnAction(e -> {
             this.clientGUI.switchPlayer();
         });
 
         this.clientGUI.player1Time = new Label(" Player1: 10:00");
         this.clientGUI.player2Time = new Label(" Player2: 10:00");
-        root.setTop(new HBox(this.clientGUI.timerButton, this.clientGUI.player1Time, this.clientGUI.player2Time));
+        HBox hbox = new HBox(timerButton, this.clientGUI.player1Time, this.clientGUI.player2Time);
+        hbox.setSpacing(10);
+        root.setTop(hbox);
 
         scene.setRoot(root);
         return scene;
     }
-    public BorderPane getViewersChatLayout(){
+
+    public BorderPane getViewersChatLayout() {
         BorderPane layout = new BorderPane();
 
         // create the chatArea
         this.clientGUI.chatArea = new TextArea();
         this.clientGUI.chatArea.setEditable(false);
-        layout.setCenter(this.clientGUI.chatArea);
+        layout.setRight(this.clientGUI.chatArea);
+        this.clientGUI.chatArea.setText("2.\n");
+        this.clientGUI.chatArea.setPrefWidth(400);
 
-        // create inputField, sendButton
+        // create the chatArea2
+        this.clientGUI.chatArea2 = new TextArea();
+        this.clientGUI.chatArea2.setEditable(false);
+        layout.setLeft(this.clientGUI.chatArea2);
+        this.clientGUI.chatArea2.setText("1.\n");
+        this.clientGUI.chatArea2.setPrefWidth(400);
+
+        // create inputField
         this.clientGUI.inputField = new TextField();
+
+        // sendButton
         Button sendButton = new Button("Send");
-        sendButton.setOnAction(e -> this.clientGUI.sendMessage());
+        sendButton.setOnAction(e -> this.clientGUI.sendMessage2());
 
         // Set an event listener for the Enter key press event on the TextField
         this.clientGUI.inputField.setOnAction(event -> {
             sendButton.fire();
         });
 
-        // pack it all up
-        HBox inputBox = new HBox(this.clientGUI.inputField, sendButton);
         // backButton
         Button backButton = new Button("Back");
-        backButton.setOnAction(e -> this.clientGUI.goBackToMainWindow());
-        // Create a VBox to hold both the back button and the input box
-        HBox bottomContainer = new HBox(inputBox, backButton);
-        bottomContainer.setSpacing(10); // Set spacing between components
-
-        // put them on bottom
-        layout.setBottom(bottomContainer);
-
-        //Scene scene = new Scene(layout, 400, 300);
-        return layout;
-    }
-
-    public BorderPane getChatLayout(){
-        BorderPane layout = new BorderPane();
-
-        // create the chatArea
-        this.clientGUI.chatArea = new TextArea();
-        this.clientGUI.chatArea.setEditable(false);
-        layout.setCenter(this.clientGUI.chatArea);
-
-        // create inputField, sendButton
-        this.clientGUI.inputField = new TextField();
-        Button sendButton = new Button("Send");
-        sendButton.setOnAction(e -> this.clientGUI.sendMessage());
-
-        // Set an event listener for the Enter key press event on the TextField
-        this.clientGUI.inputField.setOnAction(event -> {
-            sendButton.fire();
+        backButton.setOnAction(e -> {
+            this.clientGUI.goBackToMainWindow();
         });
-
-        // pack it all up
-        HBox inputBox = new HBox(this.clientGUI.inputField, sendButton);
-        // backButton
-        Button backButton = new Button("Back");
-        backButton.setOnAction(e -> this.clientGUI.goBackToMainWindow());
         // Create a VBox to hold both the back button and the input box
-        HBox bottomContainer = new HBox(inputBox, backButton);
+        HBox bottomContainer = new HBox(this.clientGUI.inputField, sendButton, backButton);
         bottomContainer.setSpacing(10); // Set spacing between components
 
         // put them on bottom
         layout.setBottom(bottomContainer);
 
+        // Scene scene = new Scene(layout, 400, 300);
         return layout;
     }
-    public Scene getWatchScene(){
-        //spojiti getChatLayout i getViewerChatLayout
-       StackPane root = new StackPane();
-        root.getChildren().addAll(getChatLayout(), getViewersChatLayout());
 
-        Scene scene = new Scene(root, 800, 600);
+    public Scene getWatchScene() {
+        HBox root = new HBox();
+        root.getChildren().addAll(getViewersChatLayout());
+
+        Scene scene = new Scene(root, 800, 300);
         return scene;
 
     }
