@@ -5,7 +5,7 @@
 </div>
 
 
-- [Short description](#inspectorGPT)
+- [Short description](#inspectorgpt---the-ultimate-chat-and-game-experience)
 - [Screenshots](#snippets)
 - [Contact](#authors)
 
