@@ -26,13 +26,13 @@ InspectorGPT brings people together in a fun and interactive environment. Join u
       <td>
         <img src="https://github.com/AnythingFree/InspectorGPT/assets/93827376/b54d95bb-0669-4af8-98ea-101739c096e9" width="200">
         <br>
-        <p>Katarina</p>
+        <p><a href=https://github.com/AnythingFree>AnythingFree</p>
       </td>
       <td width="50"></td> <!-- This creates space between the images -->
       <td>
         <img src="https://github.com/AnythingFree/InspectorGPT/assets/93827376/9b1babc2-3f2c-47f5-b2cd-f0041cfca35d" width="180">
         <br>
-        <p>Marija</p>
+        <p><a href=https://github.com/MarijaM14>MarijaM14</p>
       </td>
     </tr>
   </table>
