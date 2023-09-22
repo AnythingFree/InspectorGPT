@@ -16,7 +16,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class SceneBuilder {
@@ -34,13 +33,13 @@ public class SceneBuilder {
         HBox buttonBox = new HBox(10); // 10 is the spacing between buttons
 
         // Create buttons for the options
-        Button option1Button = new Button("General Chat");
+        Button option1Button = new Button("General Channel");
         option1Button.setOnAction(e -> this.clientGUI.handleOption1());
 
-        Button option2Button = new Button("Play Game");
+        Button option2Button = new Button("Game Zone");
         option2Button.setOnAction(e -> this.clientGUI.handleOption2());
 
-        Button option3Button = new Button("Watch Game");
+        Button option3Button = new Button("Watch & Chat");
         option3Button.setOnAction(e -> this.clientGUI.handleOption3());
 
         // Add buttons to the buttonBox

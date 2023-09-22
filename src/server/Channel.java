@@ -7,7 +7,7 @@ public class Channel {
     private final String name;
     final List<ThreadServer> subscribers;
 
-    ArrayList<String> messageHistory = new ArrayList<>();
+    private ArrayList<String> messageHistory = new ArrayList<>();
 
     public Channel(String name) {
         this.name = name;

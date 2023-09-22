@@ -42,10 +42,18 @@ public class ChannelGame extends Channel {
 
     @Override
     public synchronized void unsubscribe(ThreadServer userThread) {
-        if (!this.isGameFinished)
-            checkIfsurrender(userThread);
+        if (isHerePlayer(userThread.getUsername())) {
+            if (!this.isGameFinished) {
+                if (this.player1.equals(userThread))
+                    surrender(userThread, this.player2);
+                else
+                    surrender(userThread, this.player1);
+            }
+
+        } else {
+            this.channelChat.unsubscribe(userThread);
+        }
         subscribers.remove(userThread);
-        this.channelChat.unsubscribe(userThread);
     }
 
     @Override
@@ -74,10 +82,15 @@ public class ChannelGame extends Channel {
 
         String response = "[GPT]: " + this.playerGPT.getResponse(super.getMessageHistory());
 
-        this.subscribers.stream()
-                .forEach(u -> u.receiveMessage(response));
-
-        super.addToMessageHistory(response);
+        super.publish(null, response);
+        /*
+         * this.subscribers.stream()
+         * .forEach(u -> u.receiveMessage(response));
+         * 
+         * super.addToMessageHistory(response);
+         * 
+         * 
+         */
 
         if (response.toLowerCase().contains(this.playerGPT.secretKey.toLowerCase())) {
             gameOver(sender);
@@ -88,9 +101,13 @@ public class ChannelGame extends Channel {
     synchronized void gameOver(ThreadServer sender) {
 
         // send message to all players
+        super.publish(null, "Game over!  " + sender.getUsername() + " has won! Secret key was: "
+                        + this.playerGPT.secretKey);
+        /*
         super.subscribers.stream()
                 .forEach(u -> u.receiveMessage("Game over!  " + sender.getUsername() + " has won! Secret key was: "
                         + this.playerGPT.secretKey));
+         */
 
         // update scores
         sender.setScore(sender.getScore() + 1);
@@ -109,14 +126,6 @@ public class ChannelGame extends Channel {
         // signal GUIs to finish game
         this.player1.signalGameFinished(sender, this.chessClock.getTimeLeft());
         this.player2.signalGameFinished(sender, this.chessClock.getTimeLeft());
-    }
-
-    private void checkIfsurrender(ThreadServer userThread) {
-        if (this.player1.equals(userThread))
-            surrender(userThread, this.player2);
-        else if (this.player2.equals(userThread))
-            surrender(userThread, this.player1);
-
     }
 
     public void surrender(ThreadServer serverThread, ThreadServer winner) {
