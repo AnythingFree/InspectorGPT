@@ -5,9 +5,9 @@
 </div>
 
 
-- <a href=https://github.com/AnythingFree/InspectorGPT/edit/main/README.md#inspectorgpt---the-ultimate-chat-and-game-experience>Short description
-- <a href=https://github.com/AnythingFree/InspectorGPT/edit/main/README.md#snippets>Screenshots
-- <a href=https://github.com/AnythingFree/InspectorGPT/edit/main/README.md#authors>Contact
+- [Short description](#inspectorGPT)
+- [Screenshots](#snippets)
+- [Contact](#authors)
 
 ## InspectorGPT - The Ultimate Chat and Game Experience
 
