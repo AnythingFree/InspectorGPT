@@ -5,7 +5,9 @@
 </div>
 
 
-
+- <a href=https://github.com/AnythingFree/InspectorGPT/edit/main/README.md#inspectorgpt---the-ultimate-chat-and-game-experience>Short description
+- <a href=https://github.com/AnythingFree/InspectorGPT/edit/main/README.md#snippets>Screenshots
+- <a href=https://github.com/AnythingFree/InspectorGPT/edit/main/README.md#authors>Contact
 
 ## InspectorGPT - The Ultimate Chat and Game Experience
 
@@ -18,6 +20,24 @@ InspectorGPT is a versatile chat application that offers users an immersive plat
 3. **Watch & Chat**: Don't just play – be a spectator too! Tune in to watch others play games and engage in thrilling conversations. Cheer on your favorite players and discuss the action in real-time.
 
 InspectorGPT brings people together in a fun and interactive environment. Join us today for an unforgettable chat and gaming experience!
+## Snippets
+
+### login
+![1](https://github.com/AnythingFree/InspectorGPT/assets/93827376/22b8e869-d127-4826-bb96-911ccfe1c31a)
+### menue
+![2](https://github.com/AnythingFree/InspectorGPT/assets/93827376/c084fc3f-ceb6-4688-ba85-f96d19164818)
+### general chat
+![3](https://github.com/AnythingFree/InspectorGPT/assets/93827376/318ad50b-baec-4487-96f2-9399377a74ec)
+### game play
+![4](https://github.com/AnythingFree/InspectorGPT/assets/93827376/6da5fdfe-3f52-4186-9f13-25bcf0bf9bbd)
+### watch a game
+![5](https://github.com/AnythingFree/InspectorGPT/assets/93827376/1dcc9fe1-6b6f-4b67-837e-b4db0f4a5203)
+
+
+
+
+
+
 
 ## Authors
 <div align="center">
