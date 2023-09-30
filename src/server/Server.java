@@ -12,11 +12,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-final class ChatServer {
+final class Server {
     static final int SERVER_TEST_PORT = 5000;
 
     public static void main(String[] args) {
-        ChatServer server = new ChatServer(SERVER_TEST_PORT);
+        Server server = new Server(SERVER_TEST_PORT);
         server.execute();
     }
 
@@ -24,7 +24,7 @@ final class ChatServer {
     private final Set<ThreadServer> users;
     private List<Channel> allChannels = new ArrayList<>();
 
-    ChatServer(int port) {
+    Server(int port) {
         this.port = port;
         this.users = Collections.synchronizedSet(new HashSet<>());
         this.allChannels.add(new Channel("general"));
@@ -33,7 +33,7 @@ final class ChatServer {
     void execute() {
 
         // Create the ChannelCleanupThread
-        long cleanupIntervalMillis = 60000; // Adjust the interval as needed
+        long cleanupIntervalMillis = 60000; // 1 minute
         ThreadChannelCleanUp cleanupThread = new ThreadChannelCleanUp(allChannels, cleanupIntervalMillis);
         cleanupThread.start();
 
@@ -127,15 +127,16 @@ final class ChatServer {
     private void prepareChannel(String opponentUsername, ThreadServer user2, ThreadServer user1) {
         String name = user2.getUsername();
 
-        Channel channel = new Channel(name + " VS " + opponentUsername, user1, user2);
+        ChannelGame channel = new ChannelGame(name + " VS " + opponentUsername, user1, user2);
         this.allChannels.add(channel);
-
+        
         channel.start();
     }
 
     public List<String> getChannels() {
         return this.allChannels.stream()
                 .map(Channel::getName)
+                .filter(name -> !name.equals("general"))
                 .collect(Collectors.toList());
     }
 

@@ -14,14 +14,14 @@ import util._JsonUtil;
 final class ThreadServer extends Thread {
     private BufferedReader reader;
     private PrintWriter writer;
-    private ChatServer server;
+    private Server server;
     private Socket client;
 
     private String name;
     private Channel currentChannel;
     private int score = 0;
 
-    public ThreadServer(Socket client, ChatServer chatServer) {
+    public ThreadServer(Socket client, Server chatServer) {
         this.server = chatServer;
         this.client = client;
         try {
@@ -125,8 +125,7 @@ final class ThreadServer extends Thread {
 
                     if (respond.equals("yes")) {
                         acceptRequest();
-                        disableInputField();
-                        disableTimerButton();
+                        disableButtons();
                         this.server.triggerAcceptRequest_prepareChannel(opponentUsername, this);
                     } else if (respond.equals("no")) {
                         this.server.triggerRejectRequest(opponentUsername);
@@ -141,10 +140,6 @@ final class ThreadServer extends Thread {
                     Channel channel = this.server.getChannelByName(channelName);
                     channel.subscribe(this);
                     this.currentChannel = channel;
-                    writeHello();
-
-                    writer.println(
-                            "{type:chat; data: Connected users: " + this.server.getUsersFromChannel(channelName) + "}");
                     break;
 
                 case "unsubscribe":
@@ -162,41 +157,34 @@ final class ThreadServer extends Thread {
 
                 case "scene":
                     String scene = resultMap.get("scene").toString();
-                    if (scene.equals("gameMode")) {
-                        // writeHello();
-                        // writeRulesToTheGame();
-                        break;
-                    }
                     writer.println("{type:scene; scene:" + scene + "}");
                     break;
 
                 case "gameOptions":
                     String option = resultMap.get("option").toString();
+                    ChannelGame channelGame = (ChannelGame) this.currentChannel;
                     switch (option) {
                         case "switchPlayer":
-                            this.currentChannel.pauseClock();
+                            channelGame.pauseClock();
                             try {
-                                this.currentChannel.getClockThread().join();
+                                channelGame.getClockThread().join();
                             } catch (InterruptedException e) {
                                 System.out.println("Nesto se desilo dok se sat zaustavljau u threadserveru");
-                                ;
                             }
-                            disableInputField();
-                            disableTimerButton();
+                            disableButtons();
 
-                            ThreadServer opponThreadServer = this.currentChannel.getOpponent(this);
+                            ThreadServer opponThreadServer = channelGame.getOpponent(this);
 
-                            String player1Time = Integer.toString(this.currentChannel.getPlayer1Time());
-                            String player2Time = Integer.toString(this.currentChannel.getPlayer2Time());
+                            String player1Time = Integer.toString(channelGame.getPlayer1Time());
+                            String player2Time = Integer.toString(channelGame.getPlayer2Time());
 
                             opponThreadServer.updateTimeLabel(player1Time, player2Time);
                             updateTimeLabel(player1Time, player2Time);
 
-                            opponThreadServer.enebleInputField();
-                            opponThreadServer.enableTimerButton();
+                            opponThreadServer.enableButtons();
 
-                            this.currentChannel.switchTurn();
-                            this.currentChannel.resumeClock();
+                            channelGame.switchTurn();
+                            channelGame.resumeClock();
                             break;
 
                         default:
@@ -205,9 +193,6 @@ final class ThreadServer extends Thread {
 
                 case "refreshTable":
                     writer.println("{type:system; data:refreshTable; result:" + getDataForLeaderboard() + "}");
-                    break;
-
-                case "option3":
                     break;
 
                 case "channels":
@@ -256,20 +241,12 @@ final class ThreadServer extends Thread {
         this.writer.println("{type:system; data:notification; message:" + message + "}");
     }
 
-    private void disableInputField() {
-        this.writer.println("{type:system; data:inputFiledOFF}");
+    private void disableButtons() {
+        this.writer.println("{type:system; data:Buttons; state:OFF}");
     }
 
-    private void enebleInputField() {
-        this.writer.println("{type:system; data:inputFiledON}");
-    }
-
-    private void disableTimerButton() {
-        this.writer.println("{type:system; data:TimerButton; state:OFF}");
-    }
-
-    private void enableTimerButton() {
-        this.writer.println("{type:system; data:TimerButton; state:ON}");
+    private void enableButtons() {
+        this.writer.println("{type:system; data:Buttons; state:ON}");
     }
 
     private String getJsonFormating(List<String> usernames) {
@@ -278,22 +255,12 @@ final class ThreadServer extends Thread {
         return "{type:usernames; data:" + usernames.toString() + "}";
     }
 
-    private void writeHello() {
-        this.writer.println("{type:chat; data:Hello, " + this.name + "! You are in \"" + this.currentChannel.getName()
-                + "\"!}");
-    }
-
-    private void writeRulesToTheGame() {
-        this.writer.println("{type:chat; data:Rules: }");
-        this.writer.println("{type:chat; data:1. The secret key is an English word. No numbers or simbols.}");
-        this.writer.println("{type:chat; data:2. You have to make the GPT say it, not you.}");
-        this.writer.println(
-                "{type:chat; data:3. There are no rules! This is a school project full of bugs and anything can happen!}");
-    }
-
     public void receiveMessage(String message) {
-        System.out.println(this.name);
         writer.println("{type:chat; data:" + message + "}");
+    }
+
+    public void receiveMessage2(String message) {
+        writer.println("{type:chat2; data:" + message + "}");
     }
 
     public void receveRequest(String username) {
@@ -328,6 +295,11 @@ final class ThreadServer extends Thread {
 
     public synchronized void setScore(int score) {
         this.score = score;
+    }
+
+    @Override
+    public String toString() {
+        return this.name;
     }
 
 }

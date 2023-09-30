@@ -10,5 +10,9 @@
 # Ignore setings json
 .vscode/settings.json
 .vscode/launch.json
+<<<<<<< HEAD
 # Ignore readme
+=======
+
+>>>>>>> 23db628765f932aa9276e1717e3fead3438a7f0c
 readme.me
