@@ -161,7 +161,7 @@ public class SceneBuilder {
         Button watchButton = new Button("Watch");
         watchButton.setOnAction(e -> {
             String selectedChannel = channelListView.getSelectionModel().getSelectedItem();
-            if (selectedChannel != null) {
+            if (selectedChannel != null && !selectedChannel.equals("")) {
                 this.clientGUI.watchChatScene(selectedChannel);
             }
         });

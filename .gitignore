@@ -10,3 +10,5 @@
 # Ignore setings json
 .vscode/settings.json
 .vscode/launch.json
+
+readme.me

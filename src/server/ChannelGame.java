@@ -83,14 +83,6 @@ public class ChannelGame extends Channel {
         String response = "[GPT]: " + this.playerGPT.getResponse(super.getMessageHistory());
 
         super.publish(null, response);
-        /*
-         * this.subscribers.stream()
-         * .forEach(u -> u.receiveMessage(response));
-         * 
-         * super.addToMessageHistory(response);
-         * 
-         * 
-         */
 
         if (response.toLowerCase().contains(this.playerGPT.secretKey.toLowerCase())) {
             gameOver(sender);
@@ -102,12 +94,7 @@ public class ChannelGame extends Channel {
 
         // send message to all players
         super.publish(null, "Game over!  " + sender.getUsername() + " has won! Secret key was: "
-                        + this.playerGPT.secretKey);
-        /*
-        super.subscribers.stream()
-                .forEach(u -> u.receiveMessage("Game over!  " + sender.getUsername() + " has won! Secret key was: "
-                        + this.playerGPT.secretKey));
-         */
+                + this.playerGPT.secretKey);
 
         // update scores
         sender.setScore(sender.getScore() + 1);
@@ -171,7 +158,10 @@ public class ChannelGame extends Channel {
 
     // ne treba a zao brisati
     public synchronized boolean isHerePlayer(String username) {
-        return this.player1.getUsername().equals(username) || this.player2.getUsername().equals(username);
+        if (isGameFinished())
+            return false;
+        else
+            return this.player1.getUsername().equals(username) || this.player2.getUsername().equals(username);
     }
 
     public ThreadServer getOpponent(ThreadServer threadServer) {

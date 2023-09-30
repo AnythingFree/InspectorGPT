@@ -33,7 +33,7 @@ final class Server {
     void execute() {
 
         // Create the ChannelCleanupThread
-        long cleanupIntervalMillis = 60000; // Adjust the interval as needed
+        long cleanupIntervalMillis = 60000; // 1 minute
         ThreadChannelCleanUp cleanupThread = new ThreadChannelCleanUp(allChannels, cleanupIntervalMillis);
         cleanupThread.start();
 
