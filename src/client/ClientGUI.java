@@ -399,6 +399,6 @@ public class ClientGUI extends Application {
 	}
 
 	public void watchChatScene(){
-		this.sceneBuilder.getMainScene();
+		this.sceneBuilder.getChatScene();
 	}
 }
