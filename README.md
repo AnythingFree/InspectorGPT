@@ -7,7 +7,7 @@
 
 - [Short description](#inspectorgpt---the-ultimate-chat-and-game-experience)
 - [Screenshots](#snippets)
-- [Contact](#authors)
+- [Authors](#authors)
 
 ## InspectorGPT - The Ultimate Chat and Game Experience
 
