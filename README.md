@@ -1,9 +1,8 @@
 
 <div align="center">
   <h1>InspectorGPT</h1>
-  <img src="https://github.com/AnythingFree/InspectorGPT/assets/93827376/70e576b5-a4c5-481d-9e4b-4053a6426846" alt="logoGPT2-modified">
+  <img src="https://github.com/AnythingFree/InspectorGPT/assets/93827376/3a022395-5daf-46f4-8dc2-40db52feb79f" alt="logoGPT2-modified">
 </div>
-
 
 - [Short description](#inspectorgpt---the-ultimate-chat-and-game-experience)
 - [Screenshots](#snippets)
@@ -23,20 +22,15 @@ InspectorGPT brings people together in a fun and interactive environment. Join u
 ## Snippets
 
 ### login
-![1](https://github.com/AnythingFree/InspectorGPT/assets/93827376/22b8e869-d127-4826-bb96-911ccfe1c31a)
+![1](https://github.com/AnythingFree/InspectorGPT/assets/93827376/96646f21-c758-48f6-a3d9-e83ac8da37b4)
 ### menue
-![2](https://github.com/AnythingFree/InspectorGPT/assets/93827376/c084fc3f-ceb6-4688-ba85-f96d19164818)
+![2](https://github.com/AnythingFree/InspectorGPT/assets/93827376/37e6d50b-fde2-49c2-977f-8f63694606a3)
 ### general chat
-![3](https://github.com/AnythingFree/InspectorGPT/assets/93827376/318ad50b-baec-4487-96f2-9399377a74ec)
+![3](https://github.com/AnythingFree/InspectorGPT/assets/93827376/ea1c1462-7646-44e2-b151-9ac76f988b62)
 ### game play
-![4](https://github.com/AnythingFree/InspectorGPT/assets/93827376/6da5fdfe-3f52-4186-9f13-25bcf0bf9bbd)
+![4](https://github.com/AnythingFree/InspectorGPT/assets/93827376/e8e9e722-bd54-4e81-9958-45e49b4c01f5)
 ### watch a game
-![5](https://github.com/AnythingFree/InspectorGPT/assets/93827376/1dcc9fe1-6b6f-4b67-837e-b4db0f4a5203)
-
-
-
-
-
+![5](https://github.com/AnythingFree/InspectorGPT/assets/93827376/8101ea35-d8a4-4f1d-a0cf-088f1626717d)
 
 
 ## Authors
@@ -44,13 +38,13 @@ InspectorGPT brings people together in a fun and interactive environment. Join u
   <table>
     <tr>
       <td>
-        <img src="https://github.com/AnythingFree/InspectorGPT/assets/93827376/b54d95bb-0669-4af8-98ea-101739c096e9" width="200">
+        <img src="https://github.com/AnythingFree/InspectorGPT/assets/93827376/9051db48-eacd-4d2c-ac9e-ae79427748be" width="200">
         <br>
         <p><a href=https://github.com/AnythingFree>AnythingFree</p>
       </td>
       <td width="50"></td> <!-- This creates space between the images -->
       <td>
-        <img src="https://github.com/AnythingFree/InspectorGPT/assets/93827376/9b1babc2-3f2c-47f5-b2cd-f0041cfca35d" width="180">
+        <img src="https://github.com/AnythingFree/InspectorGPT/assets/93827376/96436d79-a5c8-46e9-9391-18c9b755967b" width="180">
         <br>
         <p><a href=https://github.com/MarijaM14>MarijaM14</p>
       </td>
