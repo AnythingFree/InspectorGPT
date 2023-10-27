@@ -490,7 +490,11 @@ public class ClientGUI extends Application {
 		// System.out.println("getChannels" + " " + channelNames);
 	}
 
+	public void watchChatScene(){
+		this.sceneBuilder.getChatScene();
+	}
 	public void setTitle(String string) {
 		this.primaryStage.setTitle(string);
+
 	}
 }
